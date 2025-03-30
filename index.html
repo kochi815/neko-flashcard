@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ねこ計算カード</title>
+  <style>
+    body {
+      font-family: "Arial", sans-serif;
+      text-align: center;
+      background-color: #fffaf0;
+      margin: 0;
+      padding: 20px;
+    }
+    h1 {
+      font-size: 2em;
+    }
+    #question {
+      font-size: 3em;
+      margin: 30px 0;
+    }
+    #info {
+      font-size: 1.2em;
+      color: #666;
+    }
+    #startBtn, #nextBtn {
+      font-size: 1.2em;
+      padding: 10px 30px;
+      margin: 10px;
+      border: none;
+      border-radius: 10px;
+      background-color: #ffb6c1;
+      color: white;
+      cursor: pointer;
+    }
+    #cat {
+      width: 150px;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+  <h1>ねこ計算カード</h1>
+  <div id="info">スタートボタンを押してね</div>
+  <div id="question">=^･◢•ᴗ•◢^=</div>
+  <button id="startBtn">スタート</button>
+  <button id="nextBtn" style="display: none;">つぎへ</button>
+  <div>
+    <img id="cat" src="https://placekitten.com/300/200" alt="ねこ">
+  </div>
+
+  <script>
+    const problems = [];
+    for (let a = 2; a < 10; a++) {
+      for (let b = 2; b < 10; b++) {
+        problems.push({ q: `${a} × ${b}`, a: a * b });
+        problems.push({ q: `${a * b} ÷ ${a}`, a: b });
+      }
+    }
+    problems.sort(() => Math.random() - 0.5);
+    const selected = problems.slice(0, 20);
+
+    let index = 0;
+    let showingAnswer = false;
+    let startTime = null;
+
+    const info = document.getElementById("info");
+    const question = document.getElementById("question");
+    const startBtn = document.getElementById("startBtn");
+    const nextBtn = document.getElementById("nextBtn");
+
+    function showNext() {
+      if (index >= selected.length) {
+        const time = ((Date.now() - startTime) / 1000).toFixed(2);
+        question.textContent = `おわり！\nタイム: ${time} 秒`;
+        info.textContent = "";
+        nextBtn.style.display = "none";
+        return;
+      }
+
+      if (!showingAnswer) {
+        question.textContent = selected[index].q;
+        info.textContent = `${index + 1} / ${selected.length}`;
+        showingAnswer = true;
+      } else {
+        question.textContent = selected[index].a;
+        showingAnswer = false;
+        index++;
+      }
+    }
+
+    startBtn.onclick = () => {
+      index = 0;
+      showingAnswer = false;
+      startTime = Date.now();
+      startBtn.style.display = "none";
+      nextBtn.style.display = "inline-block";
+      showNext();
+    };
+
+    nextBtn.onclick = showNext;
+    document.addEventListener("keydown", e => {
+      if (e.key === "Enter" && nextBtn.style.display !== "none") {
+        showNext();
+      }
+    });
+  </script>
+</body>
+</html>
