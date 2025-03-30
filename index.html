@@ -159,7 +159,7 @@
         stampText += "</div>";
       }
 
-      stampText += `<div style="margin-top:10px; font-size:1em;">$${goal - stampCount > 0 ? `あと ${goal - stampCount} スタンプでねこがふえるよ！` : ""}</div>`;
+      stampText += `<div style="margin-top:10px; font-size:1em;">${goal - stampCount > 0 ? `あと ${goal - stampCount} スタンプでねこがふえるよ！` : ""}</div>`;
       stampsDiv.innerHTML = stampText;
     }
 
