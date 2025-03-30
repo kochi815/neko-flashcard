@@ -90,6 +90,7 @@
     let index = 0;
     let showingAnswer = false;
     let startTime = null;
+    let gameStarted = false;
 
     const info = document.getElementById("info");
     const question = document.getElementById("question");
@@ -160,12 +161,15 @@
     }
 
     function showNext() {
+      if (!gameStarted) return; // ゲームが始まっていないときは処理しない
+
       if (index >= selected.length) {
         const time = ((Date.now() - startTime) / 1000).toFixed(2);
         question.textContent = `おわり！\nタイム: ${time} 秒`;
         info.textContent = "";
         nextBtn.style.display = "none";
         homeBtn.style.display = "inline-block";
+        gameStarted = false;
 
         const best = localStorage.getItem("bestTime");
         let isNewRecord = false;
@@ -210,6 +214,7 @@
       index = 0;
       showingAnswer = false;
       startTime = Date.now();
+      gameStarted = true;
       startBtn.style.display = "none";
       nextBtn.style.display = "inline-block";
       homeBtn.style.display = "none";
