@@ -6,7 +6,7 @@
   <title>ねこ計算カード</title>
   <style>
     body {
-      font-family: "Courier New", monospace;
+      font-family: "Arial", sans-serif;
       text-align: center;
       background-color: #fffaf0;
       margin: 0;
@@ -37,7 +37,7 @@
       width: 150px;
       margin-top: 20px;
     }
-    #ranking, #cats {
+    #ranking, #cats, #stampBoard {
       margin-top: 30px;
       font-size: 1em;
       color: #333;
@@ -52,13 +52,14 @@
 <body id="body">
   <h1>ねこ計算カード</h1>
   <div id="info">スタートボタンを押してね</div>
-  <div id="question">=^･◢•ᴗ•◢^=</div>
+  <div id="question">=^･ω･^=</div>
   <button id="startBtn">スタート</button>
   <button id="nextBtn" style="display: none;">つぎへ</button>
   <div>
     <img id="cat" src="https://cdn.pixabay.com/photo/2017/11/09/21/41/cat-2934720_640.jpg" alt="ねこ">
   </div>
   <div id="ranking"></div>
+  <div id="stampBoard"></div>
   <div id="cats"></div>
 
   <script>
@@ -70,7 +71,7 @@
       }
     }
     problems.sort(() => Math.random() - 0.5);
-    const selected = problems.slice(0, 20);
+    const selected = problems.slice(0, 30);
 
     let index = 0;
     let showingAnswer = false;
@@ -82,10 +83,10 @@
     const nextBtn = document.getElementById("nextBtn");
     const rankingDiv = document.getElementById("ranking");
     const catsDiv = document.getElementById("cats");
+    const stampBoard = document.getElementById("stampBoard");
     const body = document.getElementById("body");
 
     function updateCatStamps() {
-      const count = parseInt(localStorage.getItem("catCount") || "0");
       const catImages = [
         "https://cdn.pixabay.com/photo/2017/11/09/21/41/cat-2934720_640.jpg",
         "https://cdn.pixabay.com/photo/2015/03/27/13/16/cat-693662_640.jpg",
@@ -93,34 +94,28 @@
         "https://cdn.pixabay.com/photo/2015/11/16/22/14/cat-1046544_640.jpg",
         "https://cdn.pixabay.com/photo/2016/12/18/17/42/cat-1912336_640.jpg"
       ];
+      const count = parseInt(localStorage.getItem("catCount") || "0");
       catsDiv.innerHTML = "<h3>🐾 集まったねこファミリー:</h3>";
       for (let i = 0; i < count && i < 5; i++) {
         catsDiv.innerHTML += `<img src="${catImages[i]}" width="80" style="margin:5px; border-radius:10px;">`;
       }
     }
 
-    function checkLoginBonus() {
-      const lastPlay = localStorage.getItem("lastPlayDate");
-      const today = new Date().toISOString().slice(0, 10);
-      if (lastPlay !== today) {
-        const yesterday = new Date();
-        yesterday.setDate(yesterday.getDate() - 1);
-        const yesterdayStr = yesterday.toISOString().slice(0, 10);
-
-        let count = parseInt(localStorage.getItem("catCount") || "0");
-        if (lastPlay === yesterdayStr) {
-          count = Math.min(count + 1, 5);
-        } else {
-          count = 1;
-        }
-        localStorage.setItem("catCount", count);
-        localStorage.setItem("lastPlayDate", today);
-
-        setTimeout(() => {
-          alert("🎉 ねこが1匹あそびにきたよ！");
-        }, 500);
+    function updateStampBoard() {
+      const stamps = parseInt(localStorage.getItem("stampCount") || "0") % 20;
+      let stampLine = "";
+      for (let i = 0; i < 20; i++) {
+        stampLine += i < stamps ? "🐾" : "◯";
       }
-      updateCatStamps();
+
+      let message = "";
+      if (stamps < 5) message = "がんばれ！";
+      else if (stamps < 10) message = "あと半分！";
+      else if (stamps < 15) message = "ラストスパート！";
+      else if (stamps < 20) message = "猫が増えるよ！";
+      else message = "おめでとう！";
+
+      stampBoard.innerHTML = `<h3>スタンプ帳</h3><div style='font-size:1.5em;'>${stampLine}</div><div>${message}</div>`;
     }
 
     function showNext() {
@@ -154,7 +149,19 @@
         }
 
         rankingDiv.innerHTML = rankingHTML;
-        checkLoginBonus();
+
+        let stamps = parseInt(localStorage.getItem("stampCount") || "0") + 1;
+        localStorage.setItem("stampCount", stamps);
+        if (stamps % 20 === 0) {
+          let catCount = parseInt(localStorage.getItem("catCount") || "0");
+          catCount = Math.min(catCount + 1, 5);
+          localStorage.setItem("catCount", catCount);
+          setTimeout(() => {
+            alert("🎉 ねこが1匹あそびにきたよ！");
+          }, 500);
+        }
+        updateCatStamps();
+        updateStampBoard();
         return;
       }
 
@@ -193,6 +200,7 @@
     });
 
     updateCatStamps();
+    updateStampBoard();
   </script>
 </body>
 </html>
