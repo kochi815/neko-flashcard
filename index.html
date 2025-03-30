@@ -109,6 +109,7 @@
     generateProblems();
 
     let index = 0;
+    const totalQuestions = 30;
     let showingAnswer = false;
     let startTime = null;
     let gameStarted = false;
@@ -142,9 +143,19 @@
 
     function showQuestion() {
       if (index < selected.length) {
-        question.textContent = selected[index].q;
+        question.textContent = `(${index + 1}/${totalQuestions})
+` + selected[index].q;
         showingAnswer = false;
       } else {
+        endGame();
+      }
+    }/${totalQuestions})
+` + selected[index].q;
+        showingAnswer = false;
+      } else {
+        endGame();
+      }
+    } else {
         endGame();
       }
     }
@@ -200,7 +211,7 @@
       let catCount = parseInt(localStorage.getItem("catCount") || "0");
       const needed = stampGoals[catCount] || 0;
 
-      let filled = needed > 0 ? stamps - stampGoals[catCount - 1] || stamps : stamps;
+      let filled = needed > 0 ? stamps - (stampGoals[catCount - 1] || 0) : stamps;
       if (filled < 0) filled = 0;
       if (filled > needed) filled = needed;
 
