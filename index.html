@@ -59,7 +59,7 @@
 <body id="body">
   <h1>ねこ計算カード</h1>
   <div id="info">スタートボタンを押してね</div>
-  <div id="question">=^･◢•ᴗ•◢^=</div>
+  <div id="question">=^･ω･^=</div>
   <button id="startBtn">スタート</button>
   <button id="nextBtn" style="display: none;">つぎへ</button>
   <button id="homeBtn" style="display: none;">ホームにもどる</button>
@@ -82,7 +82,7 @@
         }
       }
       problems.sort(() => Math.random() - 0.5);
-      selected = problems.slice(0, 20);
+      selected = problems.slice(0, 30); // ← 30問に変更
     };
 
     generateProblems();
@@ -133,35 +133,36 @@
       stampsDiv.innerHTML = stampText;
     }
 
-    function checkLoginBonus() {
-      const lastPlay = localStorage.getItem("lastPlayDate");
-      const today = new Date().toISOString().slice(0, 10);
-      if (lastPlay !== today) {
-        localStorage.setItem("lastPlayDate", today);
-
-        let stampCount = parseInt(localStorage.getItem("stampCount") || "0");
-        let catCount = parseInt(localStorage.getItem("catCount") || "0");
-        const goal = stampGoals[catCount] || 0;
-
-        stampCount++;
-
-        if (stampCount >= goal) {
-          stampCount = 0;
-          catCount = Math.min(catCount + 1, 5);
-          setTimeout(() => {
-            alert("🎉 ねこが1匹あそびにきたよ！");
-          }, 500);
-        }
-
-        localStorage.setItem("stampCount", stampCount);
-        localStorage.setItem("catCount", catCount);
+    function addStampAndCheckBonus() {
+      let stampCount = parseInt(localStorage.getItem("stampCount") || "0");
+      let catCount = parseInt(localStorage.getItem("catCount") || "0");
+      const goal = stampGoals[catCount] || 0;
+      stampCount++;
+      if (stampCount >= goal) {
+        stampCount = 0;
+        catCount = Math.min(catCount + 1, 5);
+        setTimeout(() => {
+          alert("🎉 ねこが1匹あそびにきたよ！");
+        }, 500);
       }
+      localStorage.setItem("stampCount", stampCount);
+      localStorage.setItem("catCount", catCount);
       updateCatStamps();
       updateStampBook();
     }
 
     function showNext() {
-      if (!gameStarted) return; // ゲームが始まっていないときは処理しない
+      if (!gameStarted) return;
+
+      if (!showingAnswer && index < selected.length) {
+        question.textContent = selected[index].q;
+        info.textContent = `${index + 1} / ${selected.length}`;
+        showingAnswer = true;
+      } else if (showingAnswer) {
+        question.textContent = selected[index].a;
+        showingAnswer = false;
+        index++;
+      }
 
       if (index >= selected.length) {
         const time = ((Date.now() - startTime) / 1000).toFixed(2);
@@ -195,18 +196,7 @@
         }
 
         rankingDiv.innerHTML = rankingHTML;
-        checkLoginBonus();
-        return;
-      }
-
-      if (!showingAnswer) {
-        question.textContent = selected[index].q;
-        info.textContent = `${index + 1} / ${selected.length}`;
-        showingAnswer = true;
-      } else {
-        question.textContent = selected[index].a;
-        showingAnswer = false;
-        index++;
+        addStampAndCheckBonus();
       }
     }
 
