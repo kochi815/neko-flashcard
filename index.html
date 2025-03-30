@@ -112,7 +112,6 @@
     let showingAnswer = false;
     let startTime = null;
     let gameStarted = false;
-    let awaitingNext = false;
 
     const info = document.getElementById("info");
     const question = document.getElementById("question");
@@ -165,6 +164,65 @@
       }
     }
 
+    function endGame() {
+      gameStarted = false;
+      nextBtn.style.display = "none";
+      homeBtn.style.display = "inline-block";
+      const endTime = Date.now();
+      const elapsed = ((endTime - startTime) / 1000).toFixed(2);
+      info.innerHTML = `<span class="highlight">おわり！タイム：${elapsed} 秒</span>`;
+
+      const records = JSON.parse(localStorage.getItem("records") || "[]");
+      records.push(parseFloat(elapsed));
+      records.sort((a, b) => a - b);
+      localStorage.setItem("records", JSON.stringify(records.slice(0, 3)));
+
+      const top3 = records.slice(0, 3);
+      rankingDiv.innerHTML = `<h3>🏆 ランキング（上位3位）：</h3>` + top3.map((t, i) => `${i + 1}.　${t} 秒`).join("<br>");
+
+      // スタンプ追加
+      let stamps = parseInt(localStorage.getItem("stamps") || "0");
+      stamps++;
+      localStorage.setItem("stamps", stamps);
+
+      let catCount = parseInt(localStorage.getItem("catCount") || "0");
+      if (catCount < stampGoals.length && stamps >= stampGoals[catCount]) {
+        catCount++;
+        localStorage.setItem("catCount", catCount);
+      }
+
+      updateCatStamps();
+      updateStamps();
+    }
+
+    function updateStamps() {
+      let stamps = parseInt(localStorage.getItem("stamps") || "0");
+      let catCount = parseInt(localStorage.getItem("catCount") || "0");
+      const needed = stampGoals[catCount] || 0;
+
+      let filled = needed > 0 ? stamps - stampGoals[catCount - 1] || stamps : stamps;
+      if (filled < 0) filled = 0;
+      if (filled > needed) filled = needed;
+
+      stampsDiv.innerHTML = "<h2>スタンプ帳</h2>";
+      for (let row = 0; row < Math.ceil(needed / 5); row++) {
+        const rowDiv = document.createElement("div");
+        rowDiv.className = "stamp-row";
+        for (let col = 0; col < 5 && row * 5 + col < needed; col++) {
+          const box = document.createElement("div");
+          box.className = "stamp";
+          if (row * 5 + col < filled) box.classList.add("filled");
+          box.textContent = box.classList.contains("filled") ? "🐾" : "";
+          rowDiv.appendChild(box);
+        }
+        stampsDiv.appendChild(rowDiv);
+      }
+
+      if (catCount < 5) {
+        stampsDiv.innerHTML += `<div style="margin-top:10px; font-size:1.2em;">あと <strong>${needed - filled}</strong> スタンプでねこがふえるよ！</div>`;
+      }
+    }
+
     startBtn.addEventListener("click", () => {
       generateProblems();
       index = 0;
@@ -174,16 +232,19 @@
       nextBtn.style.display = "inline-block";
       homeBtn.style.display = "none";
       info.textContent = "がんばってね！";
+      rankingDiv.innerHTML = "";
       showQuestion();
     });
 
     nextBtn.addEventListener("click", nextStep);
+    homeBtn.addEventListener("click", () => location.reload());
     body.addEventListener("click", (e) => {
-      if (e.target !== nextBtn && e.target !== homeBtn && e.target !== startBtn) {
+      if (![startBtn, nextBtn, homeBtn].includes(e.target)) {
         nextStep();
       }
     });
 
+    updateStamps();
     updateCatStamps();
   </script>
 </body>
