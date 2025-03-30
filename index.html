@@ -37,7 +37,7 @@
       width: 150px;
       margin-top: 20px;
     }
-    #ranking {
+    #ranking, #cats {
       margin-top: 30px;
       font-size: 1em;
       color: #333;
@@ -59,6 +59,7 @@
     <img id="cat" src="https://placekitten.com/300/200" alt="ねこ">
   </div>
   <div id="ranking"></div>
+  <div id="cats"></div>
 
   <script>
     const problems = [];
@@ -80,6 +81,46 @@
     const startBtn = document.getElementById("startBtn");
     const nextBtn = document.getElementById("nextBtn");
     const rankingDiv = document.getElementById("ranking");
+    const catsDiv = document.getElementById("cats");
+
+    function updateCatStamps() {
+      const count = parseInt(localStorage.getItem("catCount") || "0");
+      const catImages = [
+        "https://placekitten.com/100/100",
+        "https://placekitten.com/101/100",
+        "https://placekitten.com/102/100",
+        "https://placekitten.com/103/100",
+        "https://placekitten.com/104/100"
+      ];
+      catsDiv.innerHTML = "<h3>🐾 集まったねこファミリー:</h3>";
+      for (let i = 0; i < count && i < 5; i++) {
+        catsDiv.innerHTML += `<img src="${catImages[i]}" width="80" style="margin:5px; border-radius:10px;">`;
+      }
+    }
+
+    function checkLoginBonus() {
+      const lastPlay = localStorage.getItem("lastPlayDate");
+      const today = new Date().toISOString().slice(0, 10);
+      if (lastPlay !== today) {
+        const yesterday = new Date();
+        yesterday.setDate(yesterday.getDate() - 1);
+        const yesterdayStr = yesterday.toISOString().slice(0, 10);
+
+        let count = parseInt(localStorage.getItem("catCount") || "0");
+        if (lastPlay === yesterdayStr) {
+          count = Math.min(count + 1, 5);
+        } else {
+          count = 1; // reset
+        }
+        localStorage.setItem("catCount", count);
+        localStorage.setItem("lastPlayDate", today);
+
+        setTimeout(() => {
+          alert("🎉 ねこが1匹あそびにきたよ！");
+        }, 500);
+      }
+      updateCatStamps();
+    }
 
     function showNext() {
       if (index >= selected.length) {
@@ -101,7 +142,7 @@
         scores.sort((a, b) => a - b);
         localStorage.setItem("scoreHistory", JSON.stringify(scores.slice(0, 5)));
 
-        let rankingHTML = "<h3>🏆 ランキング（上位3つ）:</h3><ol>";
+        let rankingHTML = "<h3>🏆 ランキング（上位3位）:</h3><ol>";
         scores.slice(0, 3).forEach((t) => {
           rankingHTML += `<li>${t} 秒</li>`;
         });
@@ -112,6 +153,7 @@
         }
 
         rankingDiv.innerHTML = rankingHTML;
+        checkLoginBonus();
         return;
       }
 
@@ -142,6 +184,9 @@
         showNext();
       }
     });
+
+    // 初期化（ページ読み込み時）
+    updateCatStamps();
   </script>
 </body>
 </html>
