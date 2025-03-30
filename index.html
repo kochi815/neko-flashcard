@@ -6,7 +6,7 @@
   <title>ねこ計算カード</title>
   <style>
     body {
-      font-family: "Arial", sans-serif;
+      font-family: "Courier New", monospace;
       text-align: center;
       background-color: #fffaf0;
       margin: 0;
@@ -49,7 +49,7 @@
     }
   </style>
 </head>
-<body>
+<body id="body">
   <h1>ねこ計算カード</h1>
   <div id="info">スタートボタンを押してね</div>
   <div id="question">=^･◢•ᴗ•◢^=</div>
@@ -82,6 +82,7 @@
     const nextBtn = document.getElementById("nextBtn");
     const rankingDiv = document.getElementById("ranking");
     const catsDiv = document.getElementById("cats");
+    const body = document.getElementById("body");
 
     function updateCatStamps() {
       const count = parseInt(localStorage.getItem("catCount") || "0");
@@ -110,7 +111,7 @@
         if (lastPlay === yesterdayStr) {
           count = Math.min(count + 1, 5);
         } else {
-          count = 1; // reset
+          count = 1;
         }
         localStorage.setItem("catCount", count);
         localStorage.setItem("lastPlayDate", today);
@@ -185,7 +186,12 @@
       }
     });
 
-    // 初期化（ページ読み込み時）
+    body.addEventListener("click", () => {
+      if (nextBtn.style.display !== "none") {
+        showNext();
+      }
+    });
+
     updateCatStamps();
   </script>
 </body>
