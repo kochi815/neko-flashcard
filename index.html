@@ -18,12 +18,13 @@
     #question {
       font-size: 3em;
       margin: 30px 0;
+      white-space: pre-line;
     }
     #info {
       font-size: 1.2em;
       color: #666;
     }
-    #startBtn, #nextBtn {
+    #startBtn, #nextBtn, #homeBtn {
       font-size: 1.2em;
       padding: 10px 30px;
       margin: 10px;
@@ -61,6 +62,7 @@
   <div id="question">=^･◢•ᴗ•◢^=</div>
   <button id="startBtn">スタート</button>
   <button id="nextBtn" style="display: none;">つぎへ</button>
+  <button id="homeBtn" style="display: none;">ホームにもどる</button>
   <div>
     <img id="cat" src="https://cdn.pixabay.com/photo/2017/11/09/21/41/cat-2934720_640.jpg" alt="ねこ">
   </div>
@@ -69,15 +71,21 @@
   <div id="cats"></div>
 
   <script>
-    const problems = [];
-    for (let a = 2; a < 10; a++) {
-      for (let b = 2; b < 10; b++) {
-        problems.push({ q: `${a} × ${b}`, a: a * b });
-        problems.push({ q: `${a * b} ÷ ${a}`, a: b });
+    let problems = [];
+    let selected = [];
+    const generateProblems = () => {
+      problems = [];
+      for (let a = 2; a < 10; a++) {
+        for (let b = 2; b < 10; b++) {
+          problems.push({ q: `${a} × ${b}`, a: a * b });
+          problems.push({ q: `${a * b} ÷ ${a}`, a: b });
+        }
       }
-    }
-    problems.sort(() => Math.random() - 0.5);
-    const selected = problems.slice(0, 20);
+      problems.sort(() => Math.random() - 0.5);
+      selected = problems.slice(0, 20);
+    };
+
+    generateProblems();
 
     let index = 0;
     let showingAnswer = false;
@@ -87,6 +95,7 @@
     const question = document.getElementById("question");
     const startBtn = document.getElementById("startBtn");
     const nextBtn = document.getElementById("nextBtn");
+    const homeBtn = document.getElementById("homeBtn");
     const rankingDiv = document.getElementById("ranking");
     const catsDiv = document.getElementById("cats");
     const body = document.getElementById("body");
@@ -156,6 +165,7 @@
         question.textContent = `おわり！\nタイム: ${time} 秒`;
         info.textContent = "";
         nextBtn.style.display = "none";
+        homeBtn.style.display = "inline-block";
 
         const best = localStorage.getItem("bestTime");
         let isNewRecord = false;
@@ -202,8 +212,14 @@
       startTime = Date.now();
       startBtn.style.display = "none";
       nextBtn.style.display = "inline-block";
+      homeBtn.style.display = "none";
       rankingDiv.innerHTML = "";
+      generateProblems();
       showNext();
+    };
+
+    homeBtn.onclick = () => {
+      location.reload();
     };
 
     nextBtn.onclick = showNext;
