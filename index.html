@@ -140,6 +140,51 @@
         catsDiv.innerHTML += `<img src="${catImages[i]}" width="80" style="margin:5px; border-radius:10px;">`;
       }
     }
+
+    function showQuestion() {
+      if (index < selected.length) {
+        question.textContent = selected[index].q;
+        showingAnswer = false;
+      } else {
+        endGame();
+      }
+    }
+
+    function showAnswer() {
+      question.textContent = selected[index].a;
+      showingAnswer = true;
+    }
+
+    function nextStep() {
+      if (!gameStarted) return;
+      if (!showingAnswer) {
+        showAnswer();
+      } else {
+        index++;
+        showQuestion();
+      }
+    }
+
+    startBtn.addEventListener("click", () => {
+      generateProblems();
+      index = 0;
+      gameStarted = true;
+      startTime = Date.now();
+      startBtn.style.display = "none";
+      nextBtn.style.display = "inline-block";
+      homeBtn.style.display = "none";
+      info.textContent = "がんばってね！";
+      showQuestion();
+    });
+
+    nextBtn.addEventListener("click", nextStep);
+    body.addEventListener("click", (e) => {
+      if (e.target !== nextBtn && e.target !== homeBtn && e.target !== startBtn) {
+        nextStep();
+      }
+    });
+
+    updateCatStamps();
   </script>
 </body>
 </html>
