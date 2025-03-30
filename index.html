@@ -94,6 +94,7 @@
   <script>
     let problems = [];
     let selected = [];
+    const totalQuestions = 30;
     const generateProblems = () => {
       problems = [];
       for (let a = 2; a < 10; a++) {
@@ -103,13 +104,12 @@
         }
       }
       problems.sort(() => Math.random() - 0.5);
-      selected = problems.slice(0, 30);
+      selected = problems.slice(0, totalQuestions);
     };
 
     generateProblems();
 
     let index = 0;
-    const totalQuestions = 30;
     let showingAnswer = false;
     let startTime = null;
     let gameStarted = false;
@@ -143,19 +143,9 @@
 
     function showQuestion() {
       if (index < selected.length) {
-        question.textContent = `(${index + 1}/${totalQuestions})
-` + selected[index].q;
+        question.textContent = `(${index + 1}/${totalQuestions})\n` + selected[index].q;
         showingAnswer = false;
       } else {
-        endGame();
-      }
-    }/${totalQuestions})
-` + selected[index].q;
-        showingAnswer = false;
-      } else {
-        endGame();
-      }
-    } else {
         endGame();
       }
     }
@@ -191,7 +181,6 @@
       const top3 = records.slice(0, 3);
       rankingDiv.innerHTML = `<h3>🏆 ランキング（上位3位）：</h3>` + top3.map((t, i) => `${i + 1}.　${t} 秒`).join("<br>");
 
-      // スタンプ追加
       let stamps = parseInt(localStorage.getItem("stamps") || "0");
       stamps++;
       localStorage.setItem("stamps", stamps);
@@ -210,8 +199,8 @@
       let stamps = parseInt(localStorage.getItem("stamps") || "0");
       let catCount = parseInt(localStorage.getItem("catCount") || "0");
       const needed = stampGoals[catCount] || 0;
-
-      let filled = needed > 0 ? stamps - (stampGoals[catCount - 1] || 0) : stamps;
+      let previous = catCount > 0 ? stampGoals[catCount - 1] : 0;
+      let filled = needed > 0 ? stamps - previous : stamps;
       if (filled < 0) filled = 0;
       if (filled > needed) filled = needed;
 
