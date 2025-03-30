@@ -37,6 +37,16 @@
       width: 150px;
       margin-top: 20px;
     }
+    #ranking {
+      margin-top: 30px;
+      font-size: 1em;
+      color: #333;
+    }
+    .highlight {
+      color: red;
+      font-weight: bold;
+      font-size: 1.5em;
+    }
   </style>
 </head>
 <body>
@@ -48,6 +58,7 @@
   <div>
     <img id="cat" src="https://placekitten.com/300/200" alt="ねこ">
   </div>
+  <div id="ranking"></div>
 
   <script>
     const problems = [];
@@ -68,6 +79,7 @@
     const question = document.getElementById("question");
     const startBtn = document.getElementById("startBtn");
     const nextBtn = document.getElementById("nextBtn");
+    const rankingDiv = document.getElementById("ranking");
 
     function showNext() {
       if (index >= selected.length) {
@@ -75,6 +87,31 @@
         question.textContent = `おわり！\nタイム: ${time} 秒`;
         info.textContent = "";
         nextBtn.style.display = "none";
+
+        const best = localStorage.getItem("bestTime");
+        let isNewRecord = false;
+
+        if (!best || parseFloat(time) < parseFloat(best)) {
+          localStorage.setItem("bestTime", time);
+          isNewRecord = true;
+        }
+
+        const scores = JSON.parse(localStorage.getItem("scoreHistory") || "[]");
+        scores.push(parseFloat(time));
+        scores.sort((a, b) => a - b);
+        localStorage.setItem("scoreHistory", JSON.stringify(scores.slice(0, 5)));
+
+        let rankingHTML = "<h3>🏆 ランキング（上位3つ）:</h3><ol>";
+        scores.slice(0, 3).forEach((t) => {
+          rankingHTML += `<li>${t} 秒</li>`;
+        });
+        rankingHTML += "</ol>";
+
+        if (isNewRecord) {
+          rankingHTML = `<div class='highlight'>✨ New Record!! ✨</div>` + rankingHTML;
+        }
+
+        rankingDiv.innerHTML = rankingHTML;
         return;
       }
 
@@ -95,6 +132,7 @@
       startTime = Date.now();
       startBtn.style.display = "none";
       nextBtn.style.display = "inline-block";
+      rankingDiv.innerHTML = "";
       showNext();
     };
 
