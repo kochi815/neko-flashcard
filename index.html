@@ -88,17 +88,20 @@
   <script>
     // ...（JS部分のコードは変更なし）...
 
-    function updateStampBook() {
-      const stampCount = parseInt(localStorage.getItem("stampCount") || "0");
-      const catCount = parseInt(localStorage.getItem("catCount") || "0");
-      const goal = stampGoals[catCount] || 0;
-      let stampText = "<h3>スタンプ帳</h3><div style='display:flex; flex-wrap:wrap; justify-content:center;'>";
-      for (let i = 0; i < goal; i++) {
-        const filled = i < stampCount ? "filled" : "";
-        stampText += `<div class="stamp ${filled}">${filled ? "🐾" : ""}</div>`;
-      }
-      stampText += `</div><div>${goal - stampCount > 0 ? `あと ${goal - stampCount} スタンプでねこがふえるよ！` : ""}</div>`;
-      stampsDiv.innerHTML = stampText;
+function updateStampBook() {
+  const stampCount = parseInt(localStorage.getItem("stampCount") || "0");
+  const catCount = parseInt(localStorage.getItem("catCount") || "0");
+  const goal = stampGoals[catCount] || 0;
+  let stampText = "<h3>スタンプ帳</h3><div style='display:flex; flex-wrap:wrap; justify-content:center;'>";
+
+  for (let i = 0; i < goal; i++) {
+    const filled = i < stampCount ? "filled" : "";
+    stampText += `<div class="stamp ${filled}">${filled ? "🐾" : ""}</div>`;
+  }
+
+  stampText += `</div><div>${goal - stampCount > 0 ? `あと ${goal - stampCount} スタンプでねこがふえるよ！` : ""}</div>`;
+  stampsDiv.innerHTML = stampText;
+}
     }
 
     // ...（以降のJSコードもそのまま）...
