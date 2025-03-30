@@ -82,7 +82,7 @@
         }
       }
       problems.sort(() => Math.random() - 0.5);
-      selected = problems.slice(0, 30); // ← 30問に変更
+      selected = problems.slice(0, 30);
     };
 
     generateProblems();
@@ -91,6 +91,7 @@
     let showingAnswer = false;
     let startTime = null;
     let gameStarted = false;
+    let awaitingNext = false;
 
     const info = document.getElementById("info");
     const question = document.getElementById("question");
@@ -154,6 +155,9 @@
     function showNext() {
       if (!gameStarted) return;
 
+      if (awaitingNext) return;
+      awaitingNext = true;
+
       if (!showingAnswer && index < selected.length) {
         question.textContent = selected[index].q;
         info.textContent = `${index + 1} / ${selected.length}`;
@@ -198,6 +202,10 @@
         rankingDiv.innerHTML = rankingHTML;
         addStampAndCheckBonus();
       }
+
+      setTimeout(() => {
+        awaitingNext = false;
+      }, 100);
     }
 
     startBtn.onclick = () => {
