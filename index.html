@@ -52,19 +52,24 @@
       margin-top: 20px;
       font-size: 2em;
       display: flex;
-      flex-wrap: wrap;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+    }
+    .stamp-row {
+      display: flex;
+      gap: 8px;
       justify-content: center;
-      gap: 10px;
     }
     .stamp {
       width: 40px;
       height: 40px;
       border: 2px dashed #ffb6c1;
       border-radius: 10px;
+      font-size: 1.5em;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 1.5em;
     }
     .stamp.filled {
       background-color: #ffb6c1;
@@ -140,12 +145,21 @@
       const stampCount = parseInt(localStorage.getItem("stampCount") || "0");
       const catCount = parseInt(localStorage.getItem("catCount") || "0");
       const goal = stampGoals[catCount] || 0;
+
       let stampText = "<h3>スタンプ帳</h3>";
-      for (let i = 0; i < goal; i++) {
-        const filled = i < stampCount ? "filled" : "";
-        stampText += `<div class="stamp ${filled}">${filled ? "🐾" : ""}</div>`;
+      let rows = Math.ceil(goal / 5);
+      let stampIndex = 0;
+
+      for (let r = 0; r < rows; r++) {
+        stampText += "<div class='stamp-row'>";
+        for (let i = 0; i < 5 && stampIndex < goal; i++, stampIndex++) {
+          const filled = stampIndex < stampCount ? "filled" : "";
+          stampText += `<div class="stamp ${filled}">${filled ? "🐾" : ""}</div>`;
+        }
+        stampText += "</div>";
       }
-      stampText += `<div style="margin-top:10px; font-size:1em;">${goal - stampCount > 0 ? `あと ${goal - stampCount} スタンプでねこがふえるよ！` : ""}</div>`;
+
+      stampText += `<div style="margin-top:10px; font-size:1em;">$${goal - stampCount > 0 ? `あと ${goal - stampCount} スタンプでねこがふえるよ！` : ""}</div>`;
       stampsDiv.innerHTML = stampText;
     }
 
