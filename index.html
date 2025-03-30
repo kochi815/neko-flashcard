@@ -85,7 +85,7 @@
   <button id="nextBtn" style="display: none;">つぎへ</button>
   <button id="homeBtn" style="display: none;">ホームにもどる</button>
   <div>
-    <img id="cat" src="https://cdn.pixabay.com/photo/2017/11/09/21/41/cat-2934720_640.jpg" alt="ねこ">
+    <img id="cat" src="/images/cat1.jpg" alt="ねこ">
   </div>
   <div id="ranking"></div>
   <div id="stamps"></div>
@@ -129,135 +129,17 @@
     function updateCatStamps() {
       const catCount = parseInt(localStorage.getItem("catCount") || "0");
       const catImages = [
-        "https://cdn.pixabay.com/photo/2017/11/09/21/41/cat-2934720_640.jpg",
-        "https://cdn.pixabay.com/photo/2015/03/27/13/16/cat-693662_640.jpg",
-        "https://cdn.pixabay.com/photo/2016/03/27/21/16/cat-1285634_640.jpg",
-        "https://cdn.pixabay.com/photo/2015/11/16/22/14/cat-1046544_640.jpg",
-        "https://cdn.pixabay.com/photo/2016/12/18/17/42/cat-1912336_640.jpg"
+        "/images/cat1.jpg",
+        "/images/cat2.jpeg",
+        "/images/cat3.jpg",
+        "/images/cat4.jpg",
+        "/images/cat5.jpg"
       ];
       catsDiv.innerHTML = "<h3>🐾 集まったねこファミリー:</h3>";
       for (let i = 0; i < catCount && i < 5; i++) {
         catsDiv.innerHTML += `<img src="${catImages[i]}" width="80" style="margin:5px; border-radius:10px;">`;
       }
     }
-
-    function updateStampBook() {
-      const stampCount = parseInt(localStorage.getItem("stampCount") || "0");
-      const catCount = parseInt(localStorage.getItem("catCount") || "0");
-      const goal = stampGoals[catCount] || 0;
-
-      let stampText = "<h3>スタンプ帳</h3>";
-      let rows = Math.ceil(goal / 5);
-      let stampIndex = 0;
-
-      for (let r = 0; r < rows; r++) {
-        stampText += "<div class='stamp-row'>";
-        for (let i = 0; i < 5 && stampIndex < goal; i++, stampIndex++) {
-          const filled = stampIndex < stampCount ? "filled" : "";
-          stampText += `<div class="stamp ${filled}">${filled ? "🐾" : ""}</div>`;
-        }
-        stampText += "</div>";
-      }
-
-      stampText += `<div style="margin-top:10px; font-size:1em;">${goal - stampCount > 0 ? `あと ${goal - stampCount} スタンプでねこがふえるよ！` : ""}</div>`;
-      stampsDiv.innerHTML = stampText;
-    }
-
-    function addStampAndCheckBonus() {
-      let stampCount = parseInt(localStorage.getItem("stampCount") || "0");
-      let catCount = parseInt(localStorage.getItem("catCount") || "0");
-      const goal = stampGoals[catCount] || 0;
-      stampCount++;
-      if (stampCount >= goal) {
-        stampCount = 0;
-        catCount = Math.min(catCount + 1, 5);
-        setTimeout(() => {
-          alert("🎉 ねこが1匹あそびにきたよ！");
-        }, 500);
-      }
-      localStorage.setItem("stampCount", stampCount);
-      localStorage.setItem("catCount", catCount);
-      updateCatStamps();
-      updateStampBook();
-    }
-
-    function showNext() {
-      if (!gameStarted || awaitingNext) return;
-      awaitingNext = true;
-
-      if (!showingAnswer && index < selected.length) {
-        question.textContent = selected[index].q;
-        info.textContent = `${index + 1} / ${selected.length}`;
-        showingAnswer = true;
-      } else if (showingAnswer) {
-        question.textContent = selected[index].a;
-        showingAnswer = false;
-        index++;
-      }
-
-      if (index >= selected.length) {
-        const time = ((Date.now() - startTime) / 1000).toFixed(2);
-        question.textContent = `おわり！\nタイム: ${time} 秒`;
-        info.textContent = "";
-        nextBtn.style.display = "none";
-        homeBtn.style.display = "inline-block";
-        gameStarted = false;
-
-        const best = localStorage.getItem("bestTime");
-        let isNewRecord = false;
-
-        if (!best || parseFloat(time) < parseFloat(best)) {
-          localStorage.setItem("bestTime", time);
-          isNewRecord = true;
-        }
-
-        const scores = JSON.parse(localStorage.getItem("scoreHistory") || "[]");
-        scores.push(parseFloat(time));
-        scores.sort((a, b) => a - b);
-        localStorage.setItem("scoreHistory", JSON.stringify(scores.slice(0, 5)));
-
-        let rankingHTML = "<h3>🏆 ランキング（上位3つ）:</h3><ol>";
-        scores.slice(0, 3).forEach((t) => {
-          rankingHTML += `<li>${t} 秒</li>`;
-        });
-        rankingHTML += "</ol>";
-
-        if (isNewRecord) {
-          rankingHTML = `<div class='highlight'>✨ New Record!! ✨</div>` + rankingHTML;
-        }
-
-        rankingDiv.innerHTML = rankingHTML;
-        addStampAndCheckBonus();
-      }
-
-      setTimeout(() => awaitingNext = false, 100);
-    }
-
-    startBtn.onclick = () => {
-      index = 0;
-      showingAnswer = false;
-      startTime = Date.now();
-      gameStarted = true;
-      startBtn.style.display = "none";
-      nextBtn.style.display = "inline-block";
-      homeBtn.style.display = "none";
-      rankingDiv.innerHTML = "";
-      generateProblems();
-      showNext();
-    };
-
-    homeBtn.onclick = () => location.reload();
-
-    nextBtn.onclick = showNext;
-    document.addEventListener("keydown", e => {
-      if (e.key === "Enter" && nextBtn.style.display !== "none") showNext();
-    });
-    body.addEventListener("click", () => {
-      if (nextBtn.style.display !== "none") showNext();
-    });
-
-    updateCatStamps();
-    updateStampBook();
   </script>
 </body>
 </html>
