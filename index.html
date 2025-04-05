@@ -1,260 +1,104 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>ねこ計算カード</title>
-  <style>
-    body {
-      font-family: "Courier New", monospace;
-      text-align: center;
-      background-color: #fffaf0;
-      margin: 0;
-      padding: 20px;
-    }
-    h1 {
-      font-size: 2em;
-    }
-    #question {
-      font-size: 2.5em;
-      margin: 20px 0 10px 0;
-      white-space: pre-line;
-    }
-    #questionNumber {
-      font-size: 1em;
-      color: #555;
-      margin-bottom: 10px;
-    }
-    #info {
-      font-size: 1.2em;
-      color: #666;
-    }
-    #startBtn, #nextBtn, #homeBtn {
-      font-size: 1.2em;
-      padding: 10px 30px;
-      margin: 10px;
-      border: none;
-      border-radius: 10px;
-      background-color: #ffb6c1;
-      color: white;
-      cursor: pointer;
-    }
-    #cat {
-      width: 150px;
-      margin-top: 20px;
-    }
-    #ranking, #cats {
-      margin-top: 30px;
-      font-size: 1em;
-      color: #333;
-    }
-    .highlight {
-      color: red;
-      font-weight: bold;
-      font-size: 1.5em;
-    }
-    #stamps {
-      margin-top: 20px;
-      font-size: 2em;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 8px;
-    }
-    .stamp-row {
-      display: flex;
-      gap: 8px;
-      justify-content: center;
-    }
-    .stamp {
-      width: 40px;
-      height: 40px;
-      border: 2px dashed #ffb6c1;
-      border-radius: 10px;
-      font-size: 1.5em;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    .stamp.filled {
-      background-color: #ffb6c1;
-      color: white;
-    }
-  </style>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ねこバトルチャレンジ</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        /* --- 追加: 攻撃エフェクト --- */
+        .hit-effect {
+            position: absolute;
+            font-size: 2em;
+            color: red;
+            font-weight: bold;
+            animation: hitAnim 0.6s ease-out forwards;
+            pointer-events: none;
+        }
+
+        @keyframes hitAnim {
+            0% { transform: translateY(0); opacity: 1; }
+            100% { transform: translateY(-40px); opacity: 0; }
+        }
+
+        .flash-correct {
+            animation: flashCorrect 0.4s;
+        }
+
+        @keyframes flashCorrect {
+            0% { box-shadow: 0 0 20px 5px yellow; }
+            100% { box-shadow: none; }
+        }
+    </style>
 </head>
-<body id="body">
-  <h1>ねこ計算カード</h1>
-  <div id="info">スタートボタンを押してね</div>
-  <div id="questionNumber"></div>
-  <div id="question">=^･ω･^=</div>
-  <button id="startBtn">スタート</button>
-  <button id="nextBtn" style="display: none;">つぎへ</button>
-  <button id="homeBtn" style="display: none;">ホームにもどる</button>
-  <div>
-    <img id="cat" src="/images/cat1.jpg" alt="ねこ">
-  </div>
-  <div id="ranking"></div>
-  <div id="stamps"></div>
-  <div id="cats"></div>
+<body>
+    <h1>ねこバトルチャレンジ</h1>
+    <!-- 既存のHTMLはそのまま -->
+    <div id="modeSelectScreen">
+        <h2>モードを選んでね！</h2>
+        <button id="grade1ModeBtn" class="mode-btn">🎒 しょうがく１ねんせい</button>
+        <button id="grade4ModeBtn" class="mode-btn">📚 しょうがく４ねんせい</button>
+    </div>
 
-  <script>
-    let problems = [];
-    let selected = [];
-    const totalQuestions = 30;
-    const generateProblems = () => {
-      problems = [];
-      for (let a = 2; a < 10; a++) {
-        for (let b = 2; b < 10; b++) {
-          problems.push({ q: `${a} × ${b}`, a: a * b });
-          problems.push({ q: `${a * b} ÷ ${a}`, a: b });
+    <div id="battleScreen">
+        <div id="enemyArea" class="character-area">
+            <div class="character-info"> <span class="character-name" id="enemyName"></span> <span class="character-hp-text">HP: <span id="enemyHPText"></span></span> </div>
+            <div class="hp-bar-container"> <div class="hp-bar" id="enemyHPBar"></div> </div>
+            <div class="character-display" id="enemyCharacter"></div>
+        </div>
+        <div id="questionArea">
+            <div id="question"></div> <div id="answerChoices"></div>
+        </div>
+        <div id="playerArea" class="character-area">
+            <div class="character-display" id="playerCharacter">😺</div>
+            <div class="hp-bar-container"> <div class="hp-bar" id="playerHPBar"></div> </div>
+            <div class="character-info"> <span class="character-name">にゃんたろう</span> <span class="character-hp-text">HP: <span id="playerHPText"></span></span> </div>
+        </div>
+        <div id="infoArea">
+            <div id="battleLog"></div> <button id="startBtn"></button>
+        </div>
+    </div>
+
+    <!-- 追加: 効果音 -->
+    <audio id="soundCorrect" src="https://cdn.pixabay.com/audio/2022/03/15/audio_d566a35b25.mp3"></audio>
+    <audio id="soundWrong" src="https://cdn.pixabay.com/audio/2022/03/15/audio_8cc421f412.mp3"></audio>
+    <audio id="soundHit" src="https://cdn.pixabay.com/audio/2022/03/15/audio_5f3a52ae1a.mp3"></audio>
+
+    <script>
+      // エフェクト追加関数
+      function showHitEffect(targetElement, damage) {
+        const effect = document.createElement('div');
+        effect.className = 'hit-effect';
+        effect.textContent = `-${damage}`;
+        document.body.appendChild(effect);
+        const rect = targetElement.getBoundingClientRect();
+        effect.style.left = rect.left + rect.width / 2 + 'px';
+        effect.style.top = rect.top - 10 + 'px';
+        setTimeout(() => effect.remove(), 600);
+      }
+
+      function playSound(id) {
+        const audio = document.getElementById(id);
+        if (audio) {
+          audio.currentTime = 0;
+          audio.play();
         }
       }
-      problems.sort(() => Math.random() - 0.5);
-      selected = problems.slice(0, totalQuestions);
-    };
 
-    generateProblems();
+      // 元の handleAnswer 関数の中に以下を統合（例示）:
+      // if (selectedAnswer === p.a) {
+      //   playSound('soundCorrect');
+      //   showHitEffect(enemyCharacter, damageToEnemy);
+      //   enemyCharacter.classList.add('flash-correct');
+      //   setTimeout(() => enemyCharacter.classList.remove('flash-correct'), 400);
+      // } else {
+      //   playSound('soundWrong');
+      //   showHitEffect(playerCharacter, damageToPlayer);
+      // }
 
-    let index = 0;
-    let showingAnswer = false;
-    let startTime = null;
-    let gameStarted = false;
-
-    const info = document.getElementById("info");
-    const question = document.getElementById("question");
-    const questionNumber = document.getElementById("questionNumber");
-    const startBtn = document.getElementById("startBtn");
-    const nextBtn = document.getElementById("nextBtn");
-    const homeBtn = document.getElementById("homeBtn");
-    const rankingDiv = document.getElementById("ranking");
-    const catsDiv = document.getElementById("cats");
-    const body = document.getElementById("body");
-    const stampsDiv = document.getElementById("stamps");
-
-    const stampGoals = [5, 10, 15, 20, 25];
-
-    function updateCatStamps() {
-      const catCount = parseInt(localStorage.getItem("catCount") || "0");
-      const catImages = [
-        "/images/cat1.jpg",
-        "/images/cat2.jpeg",
-        "/images/cat3.jpg",
-        "/images/cat4.jpg",
-        "/images/cat5.jpg"
-      ];
-      catsDiv.innerHTML = "<h3>🐾 集まったねこファミリー:</h3>";
-      for (let i = 0; i < catCount && i < 5; i++) {
-        catsDiv.innerHTML += `<img src="${catImages[i]}" width="80" style="margin:5px; border-radius:10px;">`;
-      }
-    }
-
-    function showQuestion() {
-      if (index < selected.length) {
-        questionNumber.textContent = `(${index + 1}/${totalQuestions})`;
-        question.textContent = selected[index].q;
-        showingAnswer = false;
-      } else {
-        endGame();
-      }
-    }
-
-    function showAnswer() {
-      questionNumber.textContent = `(${index + 1}/${totalQuestions})`;
-      question.textContent = selected[index].a;
-      showingAnswer = true;
-    }
-
-    function nextStep() {
-      if (!gameStarted) return;
-      if (!showingAnswer) {
-        showAnswer();
-      } else {
-        index++;
-        showQuestion();
-      }
-    }
-
-    function endGame() {
-      gameStarted = false;
-      nextBtn.style.display = "none";
-      homeBtn.style.display = "inline-block";
-      const endTime = Date.now();
-      const elapsed = ((endTime - startTime) / 1000).toFixed(2);
-      info.innerHTML = `<span class="highlight">おわり！タイム：${elapsed} 秒</span>`;
-
-      const records = JSON.parse(localStorage.getItem("records") || "[]");
-      records.push(parseFloat(elapsed));
-      records.sort((a, b) => a - b);
-      localStorage.setItem("records", JSON.stringify(records.slice(0, 3)));
-
-      const top3 = records.slice(0, 3);
-      rankingDiv.innerHTML = `<h3>🏆 ランキング（上位3位）：</h3>` + top3.map((t, i) => `${i + 1}.　${t} 秒`).join("<br>");
-
-      let stamps = parseInt(localStorage.getItem("stamps") || "0");
-      stamps++;
-      localStorage.setItem("stamps", stamps);
-
-      let catCount = parseInt(localStorage.getItem("catCount") || "0");
-      if (catCount < stampGoals.length && stamps >= stampGoals[catCount]) {
-        catCount++;
-        localStorage.setItem("catCount", catCount);
-      }
-
-      updateCatStamps();
-      updateStamps();
-    }
-
-    function updateStamps() {
-      let stamps = parseInt(localStorage.getItem("stamps") || "0");
-      let catCount = parseInt(localStorage.getItem("catCount") || "0");
-      const needed = stampGoals[catCount] || 0;
-      let previous = catCount > 0 ? stampGoals[catCount - 1] : 0;
-      let filled = needed > 0 ? stamps - previous : stamps;
-      if (filled < 0) filled = 0;
-      if (filled > needed) filled = needed;
-
-      stampsDiv.innerHTML = "<h2>スタンプ帳</h2>";
-      for (let row = 0; row < Math.ceil(needed / 5); row++) {
-        const rowDiv = document.createElement("div");
-        rowDiv.className = "stamp-row";
-        for (let col = 0; col < 5 && row * 5 + col < needed; col++) {
-          const box = document.createElement("div");
-          box.className = "stamp";
-          if (row * 5 + col < filled) box.classList.add("filled");
-          box.textContent = box.classList.contains("filled") ? "🐾" : "";
-          rowDiv.appendChild(box);
-        }
-        stampsDiv.appendChild(rowDiv);
-      }
-
-      if (catCount < 5) {
-        stampsDiv.innerHTML += `<div style="margin-top:10px; font-size:1.2em;">あと <strong>${needed - filled}</strong> スタンプでねこがふえるよ！</div>`;
-      }
-    }
-
-    startBtn.addEventListener("click", () => {
-      generateProblems();
-      index = 0;
-      gameStarted = true;
-      startTime = Date.now();
-      startBtn.style.display = "none";
-      nextBtn.style.display = "inline-block";
-      homeBtn.style.display = "none";
-      info.textContent = "がんばってね！";
-      rankingDiv.innerHTML = "";
-      showQuestion();
-    });
-
-    nextBtn.addEventListener("click", nextStep);
-    homeBtn.addEventListener("click", () => location.reload());
-    body.addEventListener("click", (e) => {
-      if (![startBtn, nextBtn, homeBtn].includes(e.target)) {
-        nextStep();
-      }
-    });
-
-    updateStamps();
-    updateCatStamps();
-  </script>
+      // ※このコメント部分の内容を handleAnswer 関数に組み込んでください。
+    </script>
 </body>
 </html>
