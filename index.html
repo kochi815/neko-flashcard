@@ -149,7 +149,7 @@
     const trainingTypeSelectScreen = document.getElementById("trainingTypeSelectScreen");
     const trainingScreen = document.getElementById("trainingScreen");
     const trainingTimer = document.getElementById("trainingTimer");
-    const trainingScore = document.getElementById("trainingScore");
+const trainingScoreDisplay = document.getElementById("trainingScore"); // ★変数名を変更！★
     const trainingEnemyDisplay = document.getElementById("trainingEnemyDisplay");
     const trainingQuestion = document.getElementById("trainingQuestion");
     const trainingAnswerChoices = document.getElementById("trainingAnswerChoices");
@@ -337,7 +337,7 @@
         }
     }
 
-    function startTraining(type) {
+function handleTrainingAnswer(selectedAnswer) {
         gameMode = 'training'; // ゲームモード設定
         trainingType = type;
         trainingScore = 0;
@@ -352,10 +352,15 @@
         trainingResultScreen.style.display = 'none';
         document.body.className = 'training-bg'; // 背景変更
 
-        // UI初期化
-        trainingTimer.textContent = `のこり時間: ${trainingTimeRemaining}秒`;
-        trainingScore.textContent = `たおした数: ${trainingScore}`;
-        trainingEnemyDisplay.textContent = '💧'; // トレーニングスライム
+    if (selectedAnswer === currentTrainingProblem.a) { // 正解
+        playSound('hitEnemy');
+        showFeedback("Correct!", "perfect");
+        trainingScore++;
+        // trainingScore.textContent = `たおした数: ${trainingScore}`; // ← 修正前
+        trainingScoreDisplay.textContent = `たおした数: ${trainingScore}`; // ★修正後: 変数名変更！★
+        trainingEnemyDisplay.classList.add('defeated');
+        playSound('enemyDefeated');
+    } else { // 不正解
 
         stopBgm(); // 他のBGMを停止
         playBgm('bgmTraining'); // トレーニングBGM開始
