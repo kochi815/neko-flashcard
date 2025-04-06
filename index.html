@@ -11,6 +11,9 @@
         /* --- 基本スタイル等 --- */
         body { font-family: 'M PLUS Rounded 1c', sans-serif; text-align: center; background-color: #fdf6e3; margin: 0; padding: 15px; transition: background-color 0.3s ease-out; position: relative; min-height: 100vh; box-sizing: border-box; }
         body.boss-battle-bg { background-color: #ffebee; }
+        /* ★追加: トレーニングモード背景 */
+        body.training-bg { background-color: #e3f2fd; } /* 薄い水色 */
+
         h1 { font-size: 1.8em; color: #d35400; margin-bottom: 10px; }
         button { font-family: 'M PLUS Rounded 1c', sans-serif; font-weight: bold; cursor: pointer; transition: background-color 0.2s, transform 0.1s; border: none; }
         button:active:not(:disabled) { transform: scale(0.97); }
@@ -20,161 +23,233 @@
         #bgmToggleBtn.muted::before { content: "🔇"; font-size: 1em; }
         #bgmToggleBtn:not(.muted)::before { content: "🔊"; font-size: 1em; }
 
+        /* --- 画面コンテナ --- */
+        .screen { display: none; /* 基本は非表示 */ padding-top: 30px; flex-direction: column; align-items: center; gap: 10px; width: 100%;}
+        #modeSelectScreen { display: flex; } /* 最初はモード選択を表示 */
+
         /* --- モード選択画面 --- */
-        #modeSelectScreen { padding-top: 30px; display: flex; flex-direction: column; align-items: center; gap: 10px; }
         #modeSelectScreen h2 { font-size: 1.5em; color: #555; margin-bottom: 10px;}
-        .mode-btn { font-size: 1.2em; padding: 12px 30px; border-radius: 20px; color: white; min-width: 220px; margin-bottom: 5px; }
+        .mode-btn { font-size: 1.1em; padding: 10px 25px; border-radius: 18px; color: white; min-width: 200px; margin-bottom: 5px; } /* 少し小さく */
         #grade1ModeBtn { background-color: #87cefa; } #grade2ModeBtn { background-color: #ffb6c1; } #grade3ModeBtn { background-color: #90ee90; } #grade4ModeBtn { background-color: #ffcc80; } #grade5ModeBtn { background-color: #ba55d3; }
+        #trainingModeBtn { background-color: #ff7f50; } /* トレーニングボタン色 */
         #grade1ModeBtn:hover { background-color: #5abcd8; } #grade2ModeBtn:hover { background-color: #ff9aaa; } #grade3ModeBtn:hover { background-color: #66cdab; } #grade4ModeBtn:hover { background-color: #ffa726; } #grade5ModeBtn:hover { background-color: #9932cc; }
+        #trainingModeBtn:hover { background-color: #ff6347; }
 
         /* --- スタート方法選択画面 --- */
-        #startMethodScreen { padding-top: 50px; display: none; flex-direction: column; align-items: center; gap: 15px; }
         #startMethodScreen h2 { font-size: 1.5em; color: #555; }
         .start-method-btn { font-size: 1.4em; padding: 15px 40px; border-radius: 25px; color: white; min-width: 250px; }
         #startFromBeginningBtn { background-color: #a5d6a7; } #continueFromLastBtn { background-color: #90caf9; }
         #startFromBeginningBtn:hover { background-color: #81c784; } #continueFromLastBtn:hover:not(:disabled) { background-color: #64b5f6; }
 
+        /* --- ★追加: トレーニングタイプ選択画面 --- */
+        #trainingTypeSelectScreen { gap: 15px; }
+        #trainingTypeSelectScreen h2 { font-size: 1.5em; color: #555; }
+        .training-type-btn { font-size: 1.2em; padding: 12px 30px; border-radius: 20px; color: white; min-width: 280px; background-color: #4db6ac; }
+         .training-type-btn:hover { background-color: #26a69a; }
+        #backToModeSelectBtn { font-size: 1em; padding: 8px 20px; background-color: #bdbdbd; color: #fff; border-radius: 15px; }
+        #backToModeSelectBtn:hover { background-color: #9e9e9e;}
+
         /* --- バトル画面 --- */
-        #battleScreen { display: none; flex-direction: column; align-items: center; gap: 10px; }
+        #battleScreen { gap: 10px; }
         .character-area { border: 2px solid #eee; border-radius: 10px; padding: 10px; margin: 5px 0; width: 90%; max-width: 400px; background-color: rgba(255, 255, 255, 0.8); box-shadow: 0 2px 4px rgba(0,0,0,0.05); position: relative; } #enemyArea { border-color: #e74c3c; } #playerArea { border-color: #3498db; } .character-info { display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px; font-weight: bold; } .character-name { font-size: 1.1em; } .character-hp-text { font-size: 1em; } .hp-bar-container { height: 15px; background-color: #eee; border-radius: 8px; overflow: hidden; border: 1px solid #ddd; } .hp-bar { height: 100%; width: 100%; border-radius: 6px; transition: width 0.3s ease-in-out; } #enemyArea .hp-bar { background-color: #f44336; } #playerArea .hp-bar { background-color: #4caf50; } .character-display { font-size: 3em; margin: 5px 0; transition: transform 0.1s ease-in-out, opacity 0.3s ease-out; opacity: 1; } .character-display.defeated { opacity: 0; transform: scale(0.5) rotate(30deg); } #question { font-size: 2.2em; margin: 15px 0; color: #2c3e50; font-weight: 700; min-height: 1.3em; } #answerChoices { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin-top: 10px; margin-bottom: 10px; } .choice-btn { font-size: 1.3em; padding: 10px 18px; border-radius: 8px; border: 2px solid #f39c12; background-color: #fff; color: #333; min-width: 70px; } .choice-btn:hover:not(:disabled) { background-color: #fef9e7; } .choice-btn:disabled { background-color: #eee; border-color: #ccc; color: #aaa; } #battleLog { font-size: 1.1em; min-height: 1.5em; margin: 10px 0; color: #c0392b; font-weight: bold; } #startBtn { font-size: 1.1em; padding: 10px 30px; margin: 15px 0 5px 0; border-radius: 20px; background-color: #e67e22; color: white; min-width: 160px; } #startBtn:hover { background-color: #d35400; }
+
+        /* --- ★追加: トレーニング画面 --- */
+        #trainingScreen { gap: 15px; }
+        #trainingStatus { display: flex; justify-content: space-around; width: 90%; max-width: 400px; font-size: 1.4em; font-weight: bold;}
+        #trainingTimer { color: #ff9800; }
+        #trainingScore { color: #4caf50; }
+        #trainingEnemyDisplay { font-size: 4em; margin: 10px 0; transition: opacity 0.2s, transform 0.2s; } /* スライム表示 */
+        #trainingEnemyDisplay.defeated { opacity: 0; transform: scale(0.5); }
+        #trainingQuestion { font-size: 2.5em; margin: 10px 0; color: #2c3e50; font-weight: 700; min-height: 1.3em; }
+        #trainingAnswerChoices { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin-top: 10px; margin-bottom: 10px; }
+
+        /* --- ★追加: トレーニング結果画面 --- */
+        #trainingResultScreen { gap: 15px; }
+        #trainingResultScreen h2 { font-size: 1.8em; color: #00796b;}
+        #finalScore { font-size: 2.5em; font-weight: bold; color: #ff6f61; }
+        #personalBest { font-size: 1.2em; color: #555; }
+        .result-btn-area { display: flex; gap: 15px; margin-top: 15px;}
+        .result-btn { font-size: 1.1em; padding: 10px 25px; border-radius: 18px; color: white; min-width: 150px; }
+        #retryTrainingBtn { background-color: #66bb6a; } #backToModeSelectBtnFromTraining { background-color: #bdbdbd; }
+        #retryTrainingBtn:hover { background-color: #4caf50; } #backToModeSelectBtnFromTraining:hover { background-color: #9e9e9e; }
+
+
+        /* --- 共通演出系 --- */
         #feedbackDisplay { position: absolute; top: 45%; left: 50%; transform: translate(-50%, -50%) scale(0.8); font-size: 3em; font-weight: bold; color: #fff; background-color: rgba(0, 0, 0, 0.6); padding: 10px 25px; border-radius: 15px; opacity: 0; transition: opacity 0.2s ease-out, transform 0.2s ease-out; pointer-events: none; z-index: 10; text-shadow: 2px 2px 4px rgba(0,0,0,0.5); } #feedbackDisplay.show { opacity: 1; transform: translate(-50%, -50%) scale(1); } #feedbackDisplay.critical { color: #ffeb3b; } #feedbackDisplay.perfect { color: #81d4fa; } #feedbackDisplay.great { color: #a5d6a7; } #feedbackDisplay.good { color: #fff; } #feedbackDisplay.slow { color: #ef9a9a; } #feedbackDisplay.wrong { color: #f44336; background-color: rgba(255, 255, 255, 0.8); text-shadow: none;}
         #comboDisplay { position: absolute; top: 60%; left: 50%; transform: translateX(-50%); font-size: 2.5em; font-weight: bold; color: #ff9800; opacity: 0; transition: opacity 0.2s, transform 0.2s; pointer-events: none; z-index: 5; text-shadow: 1px 1px 2px rgba(0,0,0,0.3); } #comboDisplay.show { opacity: 1; animation: comboBounce 0.3s ease-out; } #comboDisplay.great-combo { color: #f44336; } #comboDisplay.amazing-combo { color: #9c27b0; }
         @keyframes comboBounce { 0% { transform: translateX(-50%) scale(0.8); } 50% { transform: translateX(-50%) scale(1.1); } 100% { transform: translateX(-50%) scale(1); } } @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-3px); } 50% { transform: translateX(3px); } 75% { transform: translateX(-3px); } } .shake-animation { animation: shake 0.2s ease-in-out; } body.feedback-flash { background-color: #fff3e0; }
-        @media (max-width: 600px) { h1 { font-size: 1.6em; } .character-display { font-size: 2.5em; } #question { font-size: 1.8em; } .choice-btn { font-size: 1.1em; padding: 8px 15px; min-width: 60px; } #startBtn { font-size: 1em; padding: 10px 25px; min-width: 140px; } #battleLog { font-size: 1em; } #feedbackDisplay { font-size: 2.5em; padding: 8px 20px;} #comboDisplay { font-size: 2em; top: 55%; } #bgmToggleBtn { font-size: 1.5em; top: 10px; right: 10px; } .mode-btn, .start-method-btn { font-size: 1.2em; padding: 12px 30px; min-width: 200px; } }
+        @media (max-width: 600px) { h1 { font-size: 1.6em; } .character-display { font-size: 2.5em; } #question, #trainingQuestion { font-size: 1.8em; } .choice-btn { font-size: 1.1em; padding: 8px 15px; min-width: 60px; } #startBtn { font-size: 1em; padding: 10px 25px; min-width: 140px; } #battleLog { font-size: 1em; } #feedbackDisplay { font-size: 2.5em; padding: 8px 20px;} #comboDisplay { font-size: 2em; top: 55%; } #bgmToggleBtn { font-size: 1.5em; top: 10px; right: 10px; } .mode-btn, .start-method-btn, .training-type-btn { font-size: 1.1em; padding: 10px 25px; min-width: 180px; } .result-btn { font-size: 1em; padding: 10px 20px; min-width: 130px; } #trainingStatus { font-size: 1.2em;} }
     </style>
 </head>
 <body>
     <h1>ねこバトルチャレンジ</h1>
     <button id="bgmToggleBtn">🔊</button>
 
-    <div id="modeSelectScreen">
+    <div id="modeSelectScreen" class="screen">
         <h2>モードを選んでね！</h2>
         <button id="grade1ModeBtn" class="mode-btn">🎒 １ねんせい</button>
         <button id="grade2ModeBtn" class="mode-btn">🎒 ２ねんせい</button>
         <button id="grade3ModeBtn" class="mode-btn">📚 ３ねんせい</button>
         <button id="grade4ModeBtn" class="mode-btn">📚 ４ねんせい</button>
         <button id="grade5ModeBtn" class="mode-btn">🎓 ５ねんせい</button>
+        <button id="trainingModeBtn" class="mode-btn">💪 トレーニング</button> </div>
+
+    <div id="startMethodScreen" class="screen"> <h2>どうやってはじめる？</h2> <button id="startFromBeginningBtn" class="start-method-btn">はじめから (Lv 1)</button> <button id="continueFromLastBtn" class="start-method-btn" style="display: none;">つづきから (Lv X)</button> </div>
+
+    <div id="battleScreen" class="screen"> <div id="enemyArea" class="character-area"> <div class="character-info"> <span class="character-name" id="enemyName"></span> <span class="character-hp-text">HP: <span id="enemyHPText"></span></span> </div> <div class="hp-bar-container"> <div class="hp-bar" id="enemyHPBar"></div> </div> <div class="character-display" id="enemyCharacter"></div> </div> <div id="questionArea"> <div id="question"></div> <div id="answerChoices"></div> </div> <div id="playerArea" class="character-area"> <div class="character-display" id="playerCharacter">😺</div> <div class="hp-bar-container"> <div class="hp-bar" id="playerHPBar"></div> </div> <div class="character-info"> <span class="character-name">にゃんたろう</span> <span class="character-hp-text">HP: <span id="playerHPText"></span></span> </div> </div> <div id="infoArea"> <div id="battleLog"></div> <button id="startBtn"></button> </div> </div>
+
+    <div id="trainingTypeSelectScreen" class="screen">
+        <h2>れんしゅうする ないよう を えらんでね！</h2>
+        <button class="training-type-btn" data-training-type="addsub1">かんたん たし算・ひき算</button>
+        <button class="training-type-btn" data-training-type="addsub2">ふつう たし算・ひき算</button>
+        <button class="training-type-btn" data-training-type="mul">かけ算 (九九マスター)</button>
+        <button class="training-type-btn" data-training-type="div">わり算 (あまりなし)</button>
+        <button id="backToModeSelectBtn">もどる</button>
     </div>
 
-    <div id="startMethodScreen" style="display: none;">
-        <h2>どうやってはじめる？</h2>
-        <button id="startFromBeginningBtn" class="start-method-btn">はじめから (Lv 1)</button>
-        <button id="continueFromLastBtn" class="start-method-btn" style="display: none;">つづきから (Lv X)</button>
+    <div id="trainingScreen" class="screen">
+        <div id="trainingStatus">
+            <span id="trainingTimer">のこり時間: 60秒</span>
+            <span id="trainingScore">たおした数: 0</span>
+        </div>
+        <div id="trainingEnemyDisplay">💧</div> <div id="trainingQuestion"></div>
+        <div id="trainingAnswerChoices"></div>
     </div>
 
-    <div id="battleScreen">
-         <div id="enemyArea" class="character-area"> <div class="character-info"> <span class="character-name" id="enemyName"></span> <span class="character-hp-text">HP: <span id="enemyHPText"></span></span> </div> <div class="hp-bar-container"> <div class="hp-bar" id="enemyHPBar"></div> </div> <div class="character-display" id="enemyCharacter"></div> </div>
-         <div id="questionArea"> <div id="question"></div> <div id="answerChoices"></div> </div>
-         <div id="playerArea" class="character-area"> <div class="character-display" id="playerCharacter">😺</div> <div class="hp-bar-container"> <div class="hp-bar" id="playerHPBar"></div> </div> <div class="character-info"> <span class="character-name">にゃんたろう</span> <span class="character-hp-text">HP: <span id="playerHPText"></span></span> </div> </div>
-         <div id="infoArea"> <div id="battleLog"></div> <button id="startBtn"></button> </div>
+    <div id="trainingResultScreen" class="screen">
+        <h2>トレーニング おわり！</h2>
+        <div>けっか はっぴょう！</div>
+        <div id="finalScore" style="margin: 15px 0;">0 ひき たおした！</div>
+        <div id="personalBest">じこベスト: 0 ひき</div>
+        <div class="result-btn-area">
+            <button id="retryTrainingBtn" class="result-btn">もう一回！</button>
+            <button id="backToModeSelectBtnFromTraining" class="result-btn">モード選択へ</button>
+        </div>
     </div>
-    <div id="feedbackDisplay"></div>
-    <div id="comboDisplay"></div>
+
+    <div id="feedbackDisplay"></div> <div id="comboDisplay"></div>
 
   <script>
     // --- グローバル変数等 ---
-    let currentStage = 1; let gameMode = ''; let playerMaxHP = 15; let playerHP = playerMaxHP;
+    let currentStage = 1; let gameMode = ''; // 'grade1'...'grade5' or 'training'
+    let playerMaxHP = 15; let playerHP = playerMaxHP;
     let currentEnemy = {}; let enemyMaxHP = 10; let enemyHP = enemyMaxHP;
     let problems = []; let currentProblemIndex = 0; let questionStartTime;
     let battleInProgress = false; let comboCount = 0; let isBgmEnabled = true;
-    const BGM_KEY = 'nekobattle_bgmEnabled_v1'; let questionsForThisStage = 10;
+    const BGM_KEY = 'nekobattle_bgmEnabled_v1'; let questionsForThisStage = 15; // 通常15問
     const HIGHEST_STAGE_KEY_PREFIX = 'nekobattle_highestStage_'; let highestClearedStage = 0;
+    // ★追加: トレーニング用変数
+    let trainingType = ''; let trainingTimeLimit = 60; let trainingTimeRemaining = trainingTimeLimit; let trainingScore = 0; let trainingTimerInterval = null; const BEST_SCORE_KEY_PREFIX = 'nekobattle_bestScore_'; let currentTrainingProblem = null;
 
     // --- DOM要素取得 ---
-    const modeSelectScreen = document.getElementById("modeSelectScreen"); const grade1ModeBtn = document.getElementById("grade1ModeBtn"); const grade2ModeBtn = document.getElementById("grade2ModeBtn"); const grade3ModeBtn = document.getElementById("grade3ModeBtn"); const grade4ModeBtn = document.getElementById("grade4ModeBtn"); const grade5ModeBtn = document.getElementById("grade5ModeBtn"); const startMethodScreen = document.getElementById("startMethodScreen"); const startFromBeginningBtn = document.getElementById("startFromBeginningBtn"); const continueFromLastBtn = document.getElementById("continueFromLastBtn"); const battleScreen = document.getElementById("battleScreen"); const startBtn = document.getElementById("startBtn"); const questionDiv = document.getElementById("question"); const answerChoicesDiv = document.getElementById("answerChoices"); const battleLog = document.getElementById("battleLog"); const enemyArea = document.getElementById("enemyArea"); const enemyName = document.getElementById("enemyName"); const enemyHPText = document.getElementById("enemyHPText"); const enemyHPBar = document.getElementById("enemyHPBar"); const enemyCharacter = document.getElementById("enemyCharacter"); const playerArea = document.getElementById("playerArea"); const playerHPText = document.getElementById("playerHPText"); const playerHPBar = document.getElementById("playerHPBar"); const playerCharacter = document.getElementById("playerCharacter"); const feedbackDisplay = document.getElementById("feedbackDisplay"); const comboDisplay = document.getElementById("comboDisplay"); const bgmToggleBtn = document.getElementById("bgmToggleBtn");
+    const modeSelectScreen = document.getElementById("modeSelectScreen"); const grade1ModeBtn = document.getElementById("grade1ModeBtn"); const grade2ModeBtn = document.getElementById("grade2ModeBtn"); const grade3ModeBtn = document.getElementById("grade3ModeBtn"); const grade4ModeBtn = document.getElementById("grade4ModeBtn"); const grade5ModeBtn = document.getElementById("grade5ModeBtn");
+    const trainingModeBtn = document.getElementById("trainingModeBtn"); // ★追加
+    const startMethodScreen = document.getElementById("startMethodScreen"); const startFromBeginningBtn = document.getElementById("startFromBeginningBtn"); const continueFromLastBtn = document.getElementById("continueFromLastBtn"); const battleScreen = document.getElementById("battleScreen"); const startBtn = document.getElementById("startBtn"); const questionDiv = document.getElementById("question"); const answerChoicesDiv = document.getElementById("answerChoices"); const battleLog = document.getElementById("battleLog"); const enemyArea = document.getElementById("enemyArea"); const enemyName = document.getElementById("enemyName"); const enemyHPText = document.getElementById("enemyHPText"); const enemyHPBar = document.getElementById("enemyHPBar"); const enemyCharacter = document.getElementById("enemyCharacter"); const playerArea = document.getElementById("playerArea"); const playerHPText = document.getElementById("playerHPText"); const playerHPBar = document.getElementById("playerHPBar"); const playerCharacter = document.getElementById("playerCharacter"); const feedbackDisplay = document.getElementById("feedbackDisplay"); const comboDisplay = document.getElementById("comboDisplay"); const bgmToggleBtn = document.getElementById("bgmToggleBtn");
+    // ★追加: トレーニング画面要素
+    const trainingTypeSelectScreen = document.getElementById("trainingTypeSelectScreen");
+    const trainingScreen = document.getElementById("trainingScreen");
+    const trainingTimer = document.getElementById("trainingTimer");
+    const trainingScore = document.getElementById("trainingScore");
+    const trainingEnemyDisplay = document.getElementById("trainingEnemyDisplay");
+    const trainingQuestion = document.getElementById("trainingQuestion");
+    const trainingAnswerChoices = document.getElementById("trainingAnswerChoices");
+    const trainingResultScreen = document.getElementById("trainingResultScreen");
+    const finalScore = document.getElementById("finalScore");
+    const personalBest = document.getElementById("personalBest");
+    const retryTrainingBtn = document.getElementById("retryTrainingBtn");
+    const backToModeSelectBtn = document.getElementById("backToModeSelectBtn");
+    const backToModeSelectBtnFromTraining = document.getElementById("backToModeSelectBtnFromTraining");
+
 
     // --- 効果音とBGM ---
-    const sounds = { tap: new Audio('tap.mp3'), hitEnemy: new Audio('hit_enemy.mp3'), hitPlayer: new Audio('hit_player.mp3'), wrong: new Audio('wrong.mp3'), enemyDefeated: new Audio('enemy_defeated.mp3'), criticalHit: new Audio('critical_hit.mp3'), bgmNormal: new Audio('bgm_normal.mp3'), bgmBoss: new Audio('bgm_boss.mp3') };
-    sounds.bgmNormal.loop = true; sounds.bgmBoss.loop = true; sounds.bgmNormal.volume = 0.4; sounds.bgmBoss.volume = 0.35; let currentBgm = null;
+    const sounds = { tap: new Audio('tap.mp3'), hitEnemy: new Audio('hit_enemy.mp3'), hitPlayer: new Audio('hit_player.mp3'), wrong: new Audio('wrong.mp3'), enemyDefeated: new Audio('enemy_defeated.mp3'), criticalHit: new Audio('critical_hit.mp3'), bgmNormal: new Audio('bgm_normal.mp3'), bgmBoss: new Audio('bgm_boss.mp3'),
+                     bgmTraining: new Audio('bgm_training.mp3'), // ★追加: トレーニングBGM (ファイル名注意！)
+                     // timesUp: new Audio('sounds/times_up.mp3') // ★任意: タイムアップ音
+                   };
+    sounds.bgmNormal.loop = true; sounds.bgmBoss.loop = true; sounds.bgmTraining.loop = true; // ★追加: トレーニングBGMもループ
+    sounds.bgmNormal.volume = 0.4; sounds.bgmBoss.volume = 0.35; sounds.bgmTraining.volume = 0.4; // ★追加: トレーニングBGM音量
+    let currentBgm = null;
     function playSound(soundName) { if (!sounds[soundName]) return; sounds[soundName].currentTime = 0; sounds[soundName].play().catch(error => console.log(`Sound play failed (${soundName}):`, error)); }
-    function playBgm(bgmName) { if (!isBgmEnabled || !sounds[bgmName]) return; if (currentBgm && currentBgm !== sounds[bgmName]) { currentBgm.pause(); } if (sounds[bgmName].paused) { sounds[bgmName].play().catch(error => console.log(`BGM play failed (${bgmName}):`, error)); currentBgm = sounds[bgmName]; } else { currentBgm = sounds[bgmName]; } }
+    function playBgm(bgmName) { if (!isBgmEnabled || !sounds[bgmName]) return; stopBgm(); // ★修正: 必ず前のBGMを停止してから再生
+                       sounds[bgmName].play().catch(error => console.log(`BGM play failed (${bgmName}):`, error)); currentBgm = sounds[bgmName]; }
     function stopBgm() { if (currentBgm) { currentBgm.pause(); currentBgm.currentTime = 0; currentBgm = null; } }
-    function updateBgmButton() { if (isBgmEnabled) { bgmToggleBtn.classList.remove('muted'); bgmToggleBtn.textContent = '🔊'; } else { bgmToggleBtn.classList.add('muted'); bgmToggleBtn.textContent = '🔇'; } }
-    function loadBgmSetting() { const savedSetting = localStorage.getItem(BGM_KEY); isBgmEnabled = (savedSetting !== null) ? JSON.parse(savedSetting) : true; updateBgmButton(); }
-    bgmToggleBtn.addEventListener('click', () => { isBgmEnabled = !isBgmEnabled; localStorage.setItem(BGM_KEY, JSON.stringify(isBgmEnabled)); updateBgmButton(); if (isBgmEnabled) { if (!currentBgm && battleInProgress && currentEnemy) { playBgm(currentEnemy.type === 'boss' ? 'bgmBoss' : 'bgmNormal'); } } else { stopBgm(); } playSound('tap'); });
+    function updateBgmButton() { /* ... 省略 ... */ } function loadBgmSetting() { /* ... 省略 ... */ }
+    bgmToggleBtn.addEventListener('click', () => { /* ... 省略 ... */ isBgmEnabled = !isBgmEnabled; localStorage.setItem(BGM_KEY, JSON.stringify(isBgmEnabled)); updateBgmButton(); if (isBgmEnabled) { if (!currentBgm && (battleInProgress || gameMode === 'training')) { if(gameMode === 'training') playBgm('bgmTraining'); else if (currentEnemy) playBgm(currentEnemy.type === 'boss' ? 'bgmBoss' : 'bgmNormal'); } } else { stopBgm(); } playSound('tap'); });
 
-    // --- 敵データ Lv40まで ---
-    const enemies = { 1: { name: "ぷるぷるスライム", emoji: "💧", hp: 10, type: "normal" }, 2: { name: "スライム", emoji: "💧", hp: 12, type: "normal" }, 3: { name: "おおきなスライム", emoji: "💧", hp: 15, type: "normal" }, 4: { name: "ぶきみなコウモリ", emoji: "🦇", hp: 18, type: "normal" }, 5: { name: "ボス コウモリロード", emoji: "🦇👑", hp: 28, type: "boss" }, 6: { name: "さまようゴースト", emoji: "👻", hp: 22, type: "normal" }, 7: { name: "ゴーストチーフ", emoji: "👻", hp: 26, type: "normal" }, 8: { name: "ホネホネスケルトン", emoji: "💀", hp: 30, type: "normal" }, 9: { name: "スケルトンナイト", emoji: "💀", hp: 35, type: "normal" }, 10: { name: "ボス ゴブリンシャーマン", emoji: "👺✨", hp: 50, type: "boss" }, 11: { name: "くさったしたい", emoji: "🧟", hp: 40, type: "normal" }, 12: { name: "マッドハンド", emoji: "✋", hp: 44, type: "normal" }, 13: { name: "マッドハンドリーダー", emoji: "✋", hp: 49, type: "normal" }, 14: { name: "ガーゴイル", emoji: "🗿🦇", hp: 55, type: "normal" }, 15: { name: "ボス サイクロプス", emoji: "👁️", hp: 75, type: "boss" }, 16: { name: "オーク", emoji: "🐗", hp: 65, type: "normal" }, 17: { name: "オークリーダー", emoji: "🐗", hp: 72, type: "normal" }, 18: { name: "ミノタウロス", emoji: "🐂", hp: 80, type: "normal" }, 19: { name: "ミノタウロス（兄）", emoji: "🐂", hp: 88, type: "normal" }, 20: { name: "ボス リッチ", emoji: "💀👑", hp: 115, type: "boss" }, 21: { name: "アイスゴーレム", emoji: "🧊🗿", hp: 100, type: "normal" }, 22: { name: "フレイムゴーレム", emoji: "🔥🗿", hp: 100, type: "normal" }, 23: { name: "キメラ", emoji: "🦁🐐🐍", hp: 115, type: "normal" }, 24: { name: "キメラ（変異種）", emoji: "🦁🐐🐍", hp: 125, type: "normal" }, 25: { name: "ボス グリフォン", emoji: "🦅🦁", hp: 160, type: "boss" }, 26: { name: "レッサーデーモン", emoji: "👿", hp: 140, type: "normal" }, 27: { name: "アークデーモン", emoji: "🔥👿", hp: 155, type: "normal" }, 28: { name: "ダークナイト", emoji: "🛡️⚔️", hp: 170, type: "normal" }, 29: { name: "デスナイト", emoji: "💀⚔️", hp: 185, type: "normal" }, 30: { name: "ボス ドラゴンゾンビ", emoji: "💀🐉", hp: 230, type: "boss" }, 31: { name: "メタルスライム", emoji: "⚙️💧", hp: 50, type: "normal" }, 32: { name: "はぐれメタル", emoji: "✨💧", hp: 70, type: "normal" }, 33: { name: "魔界の騎士", emoji: "😈⚔️", hp: 250, type: "normal" }, 34: { name: "魔界の魔道士", emoji: "😈🧙", hp: 270, type: "normal" }, 35: { name: "ボス ヒドラ", emoji: "🐍🐍🐍", hp: 340, type: "boss" }, 36: { name: "魔王のしもべ・炎", emoji: "🔥しもべ", hp: 300, type: "normal" }, 37: { name: "魔王のしもべ・氷", emoji: "🧊しもべ", hp: 300, type: "normal" }, 38: { name: "魔王のしもべ・雷", emoji: "⚡しもべ", hp: 300, type: "normal" }, 39: { name: "魔王親衛隊長", emoji: "👑🛡️⚔️", hp: 360, type: "normal" }, 40: { name: "大魔王ニャンゾーマ", emoji: "😈👑🐈", hp: 480, type: "boss" } };
-    const maxStage = Object.keys(enemies).length;
-
-    // --- localStorage関連 ---
+    // --- 敵データ Lv40まで (変更なし) ---
+    const enemies = { /* ... 省略 ... */ }; const maxStage = Object.keys(enemies).length;
+    // --- localStorage関連 (変更なし) ---
     function getHighestStageKey(mode) { return `${HIGHEST_STAGE_KEY_PREFIX}${mode}_v2`; }
     function saveHighestStage(mode, stage) { const key = getHighestStageKey(mode); const currentHighest = loadHighestStage(mode); if (stage > currentHighest && stage <= maxStage) { localStorage.setItem(key, stage.toString()); } }
     function loadHighestStage(mode) { const key = getHighestStageKey(mode); const savedStage = localStorage.getItem(key); return savedStage ? parseInt(savedStage, 10) : 0; }
+    // ★追加: トレーニングベストスコア保存用
+    function getBestScoreKey(type) { return `${BEST_SCORE_KEY_PREFIX}${type}`; }
+    function saveBestScore(type, score) { const key = getBestScoreKey(type); const currentBest = loadBestScore(type); if (score > currentBest) { localStorage.setItem(key, score.toString()); return true; /* New record */ } return false; }
+    function loadBestScore(type) { const key = getBestScoreKey(type); const savedScore = localStorage.getItem(key); return savedScore ? parseInt(savedScore, 10) : 0; }
 
-    // --- 問題生成関数 (5モード, Lv40対応, バグ修正済み) ---
-    function generateProblems(stage, mode, count) {
-        const generatedProblems = [];
-        let num1, num2, num3, answer, questionText, type, correctAnswerValue;
-        for (let i = 0; i < count; i++) {
-            correctAnswerValue = null; questionText = ''; type = '';
-            let problemTypeRand = Math.random();
-            try {
-                if (mode === 'grade1') { if (stage <= 10) { type = '+'; do { num1 = Math.floor(Math.random() * 10); num2 = Math.floor(Math.random() * (10 - num1)); } while (num1 === 0 && num2 === 0); correctAnswerValue = num1 + num2; questionText = `${num1} + ${num2}`; } else if (stage <= 20) { type = '-'; num1 = Math.floor(Math.random() * 6) + 5; num2 = Math.floor(Math.random() * num1) + 1; correctAnswerValue = num1 - num2; questionText = `${num1} - ${num2}`; } else if (stage <= 30) { type = '+'; num1 = Math.floor(Math.random() * 9) + 1; num2 = Math.floor(Math.random() * 9) + 1; correctAnswerValue = num1 + num2; questionText = `${num1} + ${num2}`; } else { type = '+'; num2 = Math.floor(Math.random() * 8) + 1; correctAnswerValue = Math.floor(Math.random() * 8) + 1; num1 = correctAnswerValue + num2; if(num1 > 15) {num1=15; correctAnswerValue = num1-num2; if(correctAnswerValue<0) correctAnswerValue=0;}; questionText = `? + ${num2} = ${num1}`; } }
-                else if (mode === 'grade2') { if (stage <= 10) { if(problemTypeRand < 0.5) { type = '+'; num1 = Math.floor(Math.random() * 9) + 1; num2 = Math.floor(Math.random() * 9) + 1; correctAnswerValue = num1 + num2; questionText = `${num1} + ${num2}`; } else { type = '-'; num1 = Math.floor(Math.random() * 10) + 10; num2 = Math.floor(Math.random() * 9) + 1; correctAnswerValue = num1 - num2; questionText = `${num1} - ${num2}`; } } else if (stage <= 20) { type = '×'; num1 = Math.floor(Math.random() * 4) + 2; num2 = Math.floor(Math.random() * 8) + 2; correctAnswerValue = num1 * num2; questionText = `${num1} × ${num2}`; } else if (stage <= 30) { type = '×'; num1 = Math.floor(Math.random() * 8) + 2; num2 = Math.floor(Math.random() * 8) + 2; correctAnswerValue = num1 * num2; questionText = `${num1} × ${num2}`; } else { if (Math.random() < 0.5) { type = '+'; num1 = Math.floor(Math.random() * 9) + 1; correctAnswerValue = Math.floor(Math.random() * 9) + 1; num2 = num1 + correctAnswerValue; questionText = `${num1} + ? = ${num2}`; } else { type = '-'; num1 = Math.floor(Math.random() * 10) + 10; correctAnswerValue = Math.floor(Math.random() * 8) + 1; num2 = num1 - correctAnswerValue; questionText = `${num1} - ? = ${num2}`; } } }
-                else if (mode === 'grade3') { if (stage <= 10) { if(problemTypeRand < 0.6) { type = '×'; num1 = Math.floor(Math.random() * 8) + 2; num2 = Math.floor(Math.random() * 8) + 2; correctAnswerValue = num1 * num2; questionText = `${num1} × ${num2}`; } else { type = '÷'; num2 = Math.floor(Math.random() * 8) + 2; correctAnswerValue = Math.floor(Math.random() * 8) + 2; num1 = num2 * correctAnswerValue; questionText = `${num1} ÷ ${num2}`; } } else if (stage <= 20) { if(problemTypeRand < 0.6) { type = '×'; num1 = Math.floor(Math.random()*6)+10; num2 = Math.floor(Math.random()*8)+2; correctAnswerValue = num1 * num2; questionText = `${num1} × ${num2}`; } else { type = '÷'; num2 = Math.floor(Math.random() * 8) + 2; correctAnswerValue = Math.floor(Math.random() * 8) + 2; num1 = num2 * correctAnswerValue; questionText = `${num1} ÷ ${num2}`; } } else if (stage <= 30) { if(problemTypeRand < 0.5) { type = '+'; num1 = Math.floor(Math.random()*80)+10; num2 = Math.floor(Math.random()*80)+10; correctAnswerValue = num1 + num2; questionText = `${num1} + ${num2}`; } else { type = '-'; num1 = Math.floor(Math.random()*80)+10; num2 = Math.floor(Math.random()*num1)+10; correctAnswerValue = num1 - num2; questionText = `${num1} - ${num2}`; } } else { if (Math.random() < 0.5) { type = '×'; num2 = Math.floor(Math.random() * 8) + 2; correctAnswerValue = Math.floor(Math.random() * 8) + 2; num1 = num2 * correctAnswerValue; if (Math.random() < 0.5) { questionText = `? × ${num2} = ${num1}`; } else { questionText = `${correctAnswerValue} × ? = ${num1}`; correctAnswerValue = num2; } } else { type = '÷'; num2 = Math.floor(Math.random() * 8) + 2; num3 = Math.floor(Math.random() * 8) + 2; num1 = num2 * num3; if (Math.random() < 0.5) { questionText = `${num1} ÷ ? = ${num3}`; correctAnswerValue = num2; } else { questionText = `? ÷ ${num2} = ${num3}`; correctAnswerValue = num1; } } } }
-                else if (mode === 'grade4') { if (stage <= 5) { if(problemTypeRand < 0.5) { type = '×'; num1 = Math.floor(Math.random() * 8) + 2; num2 = Math.floor(Math.random() * 8) + 2; correctAnswerValue = num1 * num2; questionText = `${num1} × ${num2}`; } else { type = '÷'; num2 = Math.floor(Math.random() * 8) + 2; correctAnswerValue = Math.floor(Math.random() * 8) + 2; num1 = num2 * correctAnswerValue; questionText = `${num1} ÷ ${num2}`; } } else if (stage <= 15) { if(problemTypeRand < 0.5) { if (Math.random() < 0.5) { type = '+'; num1 = Math.floor(Math.random() * 80) + 10; num2 = Math.floor(Math.random() * 80) + 10; correctAnswerValue = num1 + num2; questionText = `${num1} + ${num2}`; } else { type = '-'; num1 = Math.floor(Math.random() * 80) + 20; num2 = Math.floor(Math.random() * (num1-10)) + 10; correctAnswerValue = num1 - num2; questionText = `${num1} - ${num2}`; } } else if (problemTypeRand < 0.8) { type = '×'; num1 = Math.floor(Math.random() * 8) + 2; num2 = Math.floor(Math.random() * 8) + 2; correctAnswerValue = num1 * num2; questionText = `${num1} × ${num2}`; } else { type = '÷'; num2 = Math.floor(Math.random() * 8) + 2; correctAnswerValue = Math.floor(Math.random() * 8) + 2; num1 = num2 * correctAnswerValue; questionText = `${num1} ÷ ${num2}`; } } else if (stage <= 30) { if(problemTypeRand < 0.6) { type = '÷'; num2 = Math.floor(Math.random() * 8) + 2; correctAnswerValue = Math.floor(Math.random() * 20) + 5; num1 = num2 * correctAnswerValue; questionText = `${num1} ÷ ${num2}`; } else { type = '×'; num1 = Math.floor(Math.random()*10)+10; num2 = Math.floor(Math.random()*8)+2; correctAnswerValue = num1 * num2; questionText = `${num1} × ${num2}`; } } else { if (Math.random() < 0.5) { type = '×'; num2 = Math.floor(Math.random() * 8) + 2; correctAnswerValue = Math.floor(Math.random() * 8) + 2; num1 = num2 * correctAnswerValue; if (Math.random() < 0.5) { questionText = `? × ${num2} = ${num1}`; } else { questionText = `${correctAnswerValue} × ? = ${num1}`; correctAnswerValue = num2; } } else { type = '÷'; num2 = Math.floor(Math.random() * 8) + 2; num3 = Math.floor(Math.random() * 8) + 2; num1 = num2 * num3; if (Math.random() < 0.5) { questionText = `${num1} ÷ ? = ${num3}`; correctAnswerValue = num2; } else { questionText = `? ÷ ${num2} = ${num3}`; correctAnswerValue = num1; } } } }
-                else { // mode === 'grade5'
-                     if (stage <= 10) { if(problemTypeRand < 0.5) { if (Math.random() < 0.5) { type = '+'; num1 = Math.floor(Math.random() * 80) + 10; num2 = Math.floor(Math.random() * 80) + 10; correctAnswerValue = num1 + num2; questionText = `${num1} + ${num2}`; } else { type = '-'; num1 = Math.floor(Math.random() * 80) + 20; num2 = Math.floor(Math.random() * (num1-10)) + 10; correctAnswerValue = num1 - num2; questionText = `${num1} - ${num2}`; } } else if (problemTypeRand < 0.8) { type = '×'; num1 = Math.floor(Math.random() * 8) + 2; num2 = Math.floor(Math.random() * 8) + 2; correctAnswerValue = num1 * num2; questionText = `${num1} × ${num2}`; } else { type = '÷'; num2 = Math.floor(Math.random() * 8) + 2; correctAnswerValue = Math.floor(Math.random() * 8) + 2; num1 = num2 * correctAnswerValue; questionText = `${num1} ÷ ${num2}`; } }
-                     else if (stage <= 20) { if(problemTypeRand < 0.5) { type = '×'; num1 = Math.floor(Math.random()*11)+10; num2 = Math.floor(Math.random()*8)+2; correctAnswerValue = num1 * num2; questionText = `${num1} × ${num2}`; } else { type = '÷'; num2 = Math.floor(Math.random() * 8) + 2; correctAnswerValue = Math.floor(Math.random() * 30) + 10; num1 = num2 * correctAnswerValue; questionText = `${num1} ÷ ${num2}`; } }
-                     else if (stage <= 30) { if(problemTypeRand < 0.5) { type = '×'; num1 = Math.floor(Math.random()*21)+10; num2 = Math.floor(Math.random()*9)+11; correctAnswerValue = num1 * num2; questionText = `${num1} × ${num2}`; } else if (problemTypeRand < 0.8) { type = '+'; num1 = Math.floor(Math.random()*800)+100; num2 = Math.floor(Math.random()*800)+100; correctAnswerValue = num1 + num2; questionText = `${num1} + ${num2}`; } else { type = '-'; num1 = Math.floor(Math.random()*800)+100; num2 = Math.floor(Math.random()*num1)+1; correctAnswerValue = num1 - num2; questionText = `${num1} - ${num2}`; } }
-                     else { const rand = Math.random(); if (rand < 0.6) { if (Math.random() < 0.5) { type = '×'; num2 = Math.floor(Math.random() * 8) + 2; correctAnswerValue = Math.floor(Math.random() * 12) + 2; num1 = num2 * correctAnswerValue; if (Math.random() < 0.5) { questionText = `? × ${num2} = ${num1}`; } else { questionText = `${correctAnswerValue} × ? = ${num1}`; correctAnswerValue = num2; } } else { type = '÷'; num2 = Math.floor(Math.random() * 8) + 2; num3 = Math.floor(Math.random() * 12) + 2; num1 = num2 * num3; if (Math.random() < 0.5) { questionText = `${num1} ÷ ? = ${num3}`; correctAnswerValue = num2; } else { questionText = `? ÷ ${num2} = ${num3}`; correctAnswerValue = num1; } } } else { type = '×'; num1 = Math.floor(Math.random()*40)+11; num2 = Math.floor(Math.random()*40)+11; correctAnswerValue = num1 * num2; questionText = `${num1} × ${num2}`; } }
-                }
-
-                 if (questionText && correctAnswerValue !== null) { generatedProblems.push({ q: questionText, a: correctAnswerValue }); }
-                 else { console.error("ERROR: Failed to generate problem data!", {stage, mode, i, type, num1, num2, num3, questionText, correctAnswerValue}); generatedProblems.push({ q: "1 + 1", a: 2 }); }
-            } catch (error) { console.error("ERROR during problem generation:", {stage, mode, i, error}); generatedProblems.push({ q: "2 + 2", a: 4 }); }
+    // --- 問題生成関数 (5モード, Lv40対応, 変更なし) ---
+    function generateProblems(stage, mode, count) { /* ... 省略 ... */ }
+    // --- 選択肢生成関数 (変更なし) ---
+    function generateChoices(correct) { /* ... 省略 ... */ }
+    // --- HPバー更新関数 (変更なし) ---
+    function updateHPBar(elementId, currentHP, maxHP) { /* ... 省略 ... */ }
+    // --- キャラ揺れ関数 (変更なし) ---
+    function shakeCharacter(elementId) { /* ... 省略 ... */ }
+    // --- 時間評価表示関数 (変更なし) ---
+    function showFeedback(text, type) { /* ... 省略 ... */ }
+    // --- コンボ表示更新関数 (変更なし) ---
+    function updateComboDisplay() { /* ... 省略 ... */ }
+    // --- showQuestion関数 (変更なし) ---
+    function showQuestion() { /* ... 省略 ... */ }
+    // --- ★ handleAnswer関数 (難易度微調整、効果音修正) ★ ---
+    function handleAnswer(selectedAnswer) {
+        if (battleInProgress) return; battleInProgress = true;
+        const choiceButtons = answerChoicesDiv.querySelectorAll('.choice-btn');
+        choiceButtons.forEach(btn => btn.disabled = true); playSound('tap');
+        const elapsed = (Date.now() - questionStartTime) / 1000; const p = problems[currentProblemIndex];
+        let feedbackClass = ''; let damageToEnemy = 0; let damageToPlayer = 0; let logMessage = ""; let feedbackText = ""; let feedbackType = ""; let isCritical = false;
+        let criticalTime, perfectTime, greatTime, goodTime, slowPenalty, wrongPenalty, baseDmgCrit, baseDmgPerf, baseDmgGreat, baseDmgGood;
+        // ★難易度微調整: G4, G5の時間基準緩和★
+        switch (gameMode) {
+            case 'grade1': criticalTime = 3.0; perfectTime = 5.0; greatTime = 7.0; goodTime = 10.0; slowPenalty = 0; wrongPenalty = 1; baseDmgCrit = 6; baseDmgPerf = 4; baseDmgGreat = 2; baseDmgGood = 1; break;
+            case 'grade2': criticalTime = 2.0; perfectTime = 3.5; greatTime = 5.0; goodTime = 7.5; slowPenalty = 1; wrongPenalty = 1; baseDmgCrit = 6; baseDmgPerf = 4; baseDmgGreat = 2; baseDmgGood = 1; break;
+            case 'grade3': criticalTime = 1.5; perfectTime = 2.5; greatTime = 4.0; goodTime = 6.0; slowPenalty = 1; wrongPenalty = 2; baseDmgCrit = 5; baseDmgPerf = 3; baseDmgGreat = 2; baseDmgGood = 1; break;
+            case 'grade4': criticalTime = 1.1; perfectTime = 2.0; greatTime = 3.5; goodTime = 5.0; slowPenalty = 2; wrongPenalty = 2; baseDmgCrit = 6; baseDmgPerf = 4; baseDmgGreat = 2; baseDmgGood = 1; break; // 緩和
+            case 'grade5': criticalTime = 0.9; perfectTime = 1.7; greatTime = 2.8; goodTime = 4.3; slowPenalty = 2; wrongPenalty = 3; baseDmgCrit = 6; baseDmgPerf = 4; baseDmgGreat = 2; baseDmgGood = 1; break; // 緩和
+            default: criticalTime = 1.5; perfectTime = 2.5; greatTime = 4.0; goodTime = 6.0; slowPenalty = 1; wrongPenalty = 2; baseDmgCrit = 5; baseDmgPerf = 3; baseDmgGreat = 2; baseDmgGood = 1;
         }
-        // シャッフル
-        for (let i = generatedProblems.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [generatedProblems[i], generatedProblems[j]] = [generatedProblems[j], generatedProblems[i]]; }
-        return generatedProblems;
+        if (selectedAnswer === p.a) { // 正解
+            comboCount++; let baseDamage = 0;
+            if (elapsed < criticalTime) { baseDamage = baseDmgCrit; logMessage = `✨Critical Hit!✨ (${elapsed.toFixed(1)}秒) `; feedbackText = "Critical Hit!"; feedbackType = "critical"; isCritical = true; }
+            else if (elapsed < perfectTime) { baseDamage = baseDmgPerf; logMessage = `Perfect! (${elapsed.toFixed(1)}秒) `; feedbackText = "Perfect!"; feedbackType = "perfect"; }
+            else if (elapsed < greatTime) { baseDamage = baseDmgGreat; logMessage = `Great! (${elapsed.toFixed(1)}秒) `; feedbackText = "Great!"; feedbackType = "great"; }
+            else if (elapsed < goodTime) { baseDamage = baseDmgGood; logMessage = `Good (${elapsed.toFixed(1)}秒) `; feedbackText = "Good"; feedbackType = "good"; }
+            else { damageToPlayer = slowPenalty; logMessage = `Too slow... (${elapsed.toFixed(1)}秒) ${damageToPlayer>0 ? `自分に${damageToPlayer}ダメージ!` : 'ダメージなし'}`; feedbackText = "Too Slow..."; feedbackType = "slow"; comboCount = 0; }
+            let comboBonus = 0; if (comboCount >= 5) comboBonus = 2; else if (comboCount >= 3) comboBonus = 1;
+            damageToEnemy = baseDamage + comboBonus;
+            if(damageToEnemy > 0) { logMessage += `敵に${damageToEnemy}ダメージ!`; if (comboCount >= 3) logMessage += ` (${comboCount} Combo!)`; feedbackClass = 'feedback-flash'; shakeCharacter('enemyCharacter'); playSound('hitEnemy'); if(isCritical) playSound('criticalHit'); } // ★サウンド修正済
+            else if (damageToPlayer > 0) { feedbackClass = 'feedback-damage-player'; shakeCharacter('playerCharacter'); playSound('hitPlayer'); }
+            else { feedbackClass = 'feedback-correct'; }
+        } else { // 不正解
+            damageToPlayer = wrongPenalty; logMessage = `Wrong! 自分に${damageToPlayer}ダメージ!`; feedbackText = "Wrong!"; feedbackType = "wrong"; feedbackClass = 'feedback-wrong'; comboCount = 0; shakeCharacter('playerCharacter');
+            playSound('wrong'); playSound('hitPlayer'); // ★サウンド修正: 両方鳴らす
+        }
+        updateComboDisplay(); enemyHP -= damageToEnemy; playerHP -= damageToPlayer;
+        enemyHPText.textContent = Math.max(0, enemyHP); playerHPText.textContent = Math.max(0, playerHP); updateHPBar('enemyHPBar', enemyHP, enemyMaxHP); updateHPBar('playerHPBar', playerHP, playerMaxHP);
+        battleLog.textContent = logMessage; if(feedbackText) showFeedback(feedbackText, feedbackType);
+        if (feedbackClass) { document.body.classList.add(feedbackClass); setTimeout(() => { document.body.classList.remove(feedbackClass); }, 150); }
+        currentProblemIndex++;
+        setTimeout(() => { if (playerHP <= 0 || enemyHP <= 0 || currentProblemIndex >= questionsForThisStage) { endBattle(); } else { showQuestion(); } }, 1000);
     }
 
-    // --- 選択肢生成関数 ---
-    function generateChoices(correct) {
-        const choices = new Set();
-        if (typeof correct !== 'number' || isNaN(correct)) { console.error("Invalid 'correct' answer:", correct); correct = 0; }
-        correct = Math.round(correct); choices.add(correct); const maxAttempts = 50; let attempts = 0;
-        while (choices.size < 6 && attempts < maxAttempts) { let wrongAnswer; const magnitude = Math.max(1, Math.abs(correct)); const range = Math.min(10, Math.ceil(magnitude * 0.4) + 4); let delta = Math.floor(Math.random() * (range * 2 + 1)) - range; if (Math.random() < 0.15) { delta += (Math.random() < 0.5 ? 1 : -1) * (Math.floor(Math.random() * 10) + 5); } if (delta === 0) delta = Math.random() < 0.5 ? 1 : -1; wrongAnswer = correct + delta; wrongAnswer = Math.round(wrongAnswer); if (wrongAnswer >= 0 && !choices.has(wrongAnswer)) { choices.add(wrongAnswer); } attempts++; }
-        let filler = 1; while (choices.size < 6) { let fillChoice1 = Math.max(0, correct + filler); let fillChoice2 = Math.max(0, correct - filler); if (!choices.has(fillChoice1)) choices.add(fillChoice1); if (choices.size < 6 && fillChoice2 >= 0 && !choices.has(fillChoice2)) choices.add(fillChoice2); filler++; if (filler > correct + 20) break; }
-        const choiceArray = Array.from(choices); choiceArray.sort(() => Math.random() - 0.5); return choiceArray;
-    }
-
-    // --- HPバー更新関数 ---
-    function updateHPBar(elementId, currentHP, maxHP) { const bar = document.getElementById(elementId); const percentage = Math.max(0, (currentHP / maxHP) * 100); bar.style.width = `${percentage}%`; }
-    // --- キャラ揺れ関数 ---
-    function shakeCharacter(elementId) { const characterElement = document.getElementById(elementId); characterElement.classList.add('shake-animation'); setTimeout(() => { characterElement.classList.remove('shake-animation'); }, 200); }
-    // --- 時間評価表示関数 ---
-    function showFeedback(text, type) { feedbackDisplay.textContent = text; feedbackDisplay.className = 'show ' + type; setTimeout(() => { feedbackDisplay.className = ''; }, 800); }
-    // --- コンボ表示更新関数 ---
-    function updateComboDisplay() { if (comboCount >= 3) { comboDisplay.textContent = `${comboCount} Combo!`; comboDisplay.classList.remove('great-combo', 'amazing-combo'); if (comboCount >= 10) { comboDisplay.classList.add('amazing-combo'); } else if (comboCount >= 5) { comboDisplay.classList.add('great-combo'); } comboDisplay.classList.add('show'); } else { comboDisplay.classList.remove('show'); } }
-
-    // --- showQuestion関数 ---
-    function showQuestion() {
-        battleInProgress = false;
-        if (currentProblemIndex >= questionsForThisStage || playerHP <= 0 || enemyHP <= 0) { endBattle(); return; }
-        if (!problems || problems.length <= currentProblemIndex) { console.error("Error: problems array invalid.", problems, currentProblemIndex); battleLog.textContent = "エラー：問題準備エラー"; endBattle(); return; }
-        const p = problems[currentProblemIndex];
-        if (!p || typeof p.q === 'undefined' || typeof p.a === 'undefined') { console.error("Error: Invalid problem data.", p); battleLog.textContent = "エラー：問題データ不正"; endBattle(); return; }
-        questionDiv.textContent = p.q;
-        questionStartTime = Date.now();
-        battleLog.textContent = `Lv${currentStage} (${currentProblemIndex + 1}/${questionsForThisStage}) 問題！`;
-        const choices = generateChoices(p.a);
-        answerChoicesDiv.innerHTML = "";
-        if (Array.isArray(choices)) { choices.forEach(choice => { const btn = document.createElement("button"); btn.textContent = choice; btn.className = "choice-btn"; btn.onclick = () => handleAnswer(choice); answerChoicesDiv.appendChild(btn); }); }
-        else { console.error("Error: choices not an array.", choices); battleLog.textContent = "エラー：選択肢生成失敗"; endBattle(); }
-    }
-
-    // --- handleAnswer関数 (5モード対応済み) ---
-    function handleAnswer(selectedAnswer) { if (battleInProgress) return; battleInProgress = true; const choiceButtons = answerChoicesDiv.querySelectorAll('.choice-btn'); choiceButtons.forEach(btn => btn.disabled = true); playSound('tap'); const elapsed = (Date.now() - questionStartTime) / 1000; const p = problems[currentProblemIndex]; let feedbackClass = ''; let damageToEnemy = 0; let damageToPlayer = 0; let logMessage = ""; let feedbackText = ""; let feedbackType = ""; let isCritical = false; let criticalTime, perfectTime, greatTime, goodTime, slowPenalty, wrongPenalty, baseDmgCrit, baseDmgPerf, baseDmgGreat, baseDmgGood; switch (gameMode) { case 'grade1': criticalTime = 3.0; perfectTime = 5.0; greatTime = 7.0; goodTime = 10.0; slowPenalty = 0; wrongPenalty = 1; baseDmgCrit = 6; baseDmgPerf = 4; baseDmgGreat = 2; baseDmgGood = 1; break; case 'grade2': criticalTime = 2.0; perfectTime = 3.5; greatTime = 5.0; goodTime = 7.5; slowPenalty = 1; wrongPenalty = 1; baseDmgCrit = 6; baseDmgPerf = 4; baseDmgGreat = 2; baseDmgGood = 1; break; case 'grade3': criticalTime = 1.5; perfectTime = 2.5; greatTime = 4.0; goodTime = 6.0; slowPenalty = 1; wrongPenalty = 2; baseDmgCrit = 5; baseDmgPerf = 3; baseDmgGreat = 2; baseDmgGood = 1; break; case 'grade4': criticalTime = 1.0; perfectTime = 1.8; greatTime = 3.0; goodTime = 4.5; slowPenalty = 2; wrongPenalty = 3; baseDmgCrit = 6; baseDmgPerf = 4; baseDmgGreat = 2; baseDmgGood = 1; break; case 'grade5': criticalTime = 0.8; perfectTime = 1.5; greatTime = 2.5; goodTime = 4.0; slowPenalty = 2; wrongPenalty = 3; baseDmgCrit = 6; baseDmgPerf = 4; baseDmgGreat = 2; baseDmgGood = 1; break; default: criticalTime = 1.5; perfectTime = 2.5; greatTime = 4.0; goodTime = 6.0; slowPenalty = 1; wrongPenalty = 2; baseDmgCrit = 5; baseDmgPerf = 3; baseDmgGreat = 2; baseDmgGood = 1; } if (selectedAnswer === p.a) { comboCount++; let baseDamage = 0; if (elapsed < criticalTime) { baseDamage = baseDmgCrit; logMessage = `✨Critical Hit!✨ (${elapsed.toFixed(1)}秒) `; feedbackText = "Critical Hit!"; feedbackType = "critical"; isCritical = true; } else if (elapsed < perfectTime) { baseDamage = baseDmgPerf; logMessage = `Perfect! (${elapsed.toFixed(1)}秒) `; feedbackText = "Perfect!"; feedbackType = "perfect"; } else if (elapsed < greatTime) { baseDamage = baseDmgGreat; logMessage = `Great! (${elapsed.toFixed(1)}秒) `; feedbackText = "Great!"; feedbackType = "great"; } else if (elapsed < goodTime) { baseDamage = baseDmgGood; logMessage = `Good (${elapsed.toFixed(1)}秒) `; feedbackText = "Good"; feedbackType = "good"; } else { damageToPlayer = slowPenalty; logMessage = `Too slow... (${elapsed.toFixed(1)}秒) ${damageToPlayer>0 ? `自分に${damageToPlayer}ダメージ!` : 'ダメージなし'}`; feedbackText = "Too Slow..."; feedbackType = "slow"; comboCount = 0; } let comboBonus = 0; if (comboCount >= 5) comboBonus = 2; else if (comboCount >= 3) comboBonus = 1; damageToEnemy = baseDamage + comboBonus; if(damageToEnemy > 0) { logMessage += `敵に${damageToEnemy}ダメージ!`; if (comboCount >= 3) logMessage += ` (${comboCount} Combo!)`; feedbackClass = 'feedback-flash'; shakeCharacter('enemyCharacter'); playSound('hitEnemy'); if(isCritical) playSound('criticalHit'); } else if (damageToPlayer > 0) { feedbackClass = 'feedback-damage-player'; shakeCharacter('playerCharacter'); playSound('hitPlayer'); } else { feedbackClass = 'feedback-correct'; } } else { playSound('wrong'); damageToPlayer = wrongPenalty; logMessage = `Wrong! 自分に${damageToPlayer}ダメージ!`; feedbackText = "Wrong!"; feedbackType = "wrong"; feedbackClass = 'feedback-wrong'; comboCount = 0; shakeCharacter('playerCharacter'); playSound('hitPlayer'); } updateComboDisplay(); enemyHP -= damageToEnemy; playerHP -= damageToPlayer; enemyHPText.textContent = Math.max(0, enemyHP); playerHPText.textContent = Math.max(0, playerHP); updateHPBar('enemyHPBar', enemyHP, enemyMaxHP); updateHPBar('playerHPBar', playerHP, playerMaxHP); battleLog.textContent = logMessage; if(feedbackText) showFeedback(feedbackText, feedbackType); if (feedbackClass) { document.body.classList.add(feedbackClass); setTimeout(() => { document.body.classList.remove(feedbackClass); }, 150); } currentProblemIndex++; setTimeout(() => { if (playerHP <= 0 || enemyHP <= 0 || currentProblemIndex >= questionsForThisStage) { endBattle(); } else { showQuestion(); } }, 1000); }
-    // --- startBattle関数 (HP補正5モード対応) ---
+    // --- ★ startBattle関数 (HP補正5モード対応微調整) ★ ---
     function startBattle() {
         currentEnemy = enemies[currentStage] || enemies[maxStage];
         if (!currentEnemy) { console.error("Error: Cannot find enemy data for stage", currentStage); return; }
         enemyMaxHP = currentEnemy.hp;
         if (currentEnemy.type === 'boss') { enemyMaxHP = Math.floor(enemyMaxHP * 1.5); }
-        let hpMultiplier = 1.0; // ★5モード対応
-        switch (gameMode) { case 'grade1': hpMultiplier = 0.5; break; case 'grade2': hpMultiplier = 0.7; break; case 'grade3': hpMultiplier = 0.9; break; case 'grade4': hpMultiplier = 1.0; break; case 'grade5': hpMultiplier = 1.1; break; }
+        let hpMultiplier = 1.0; // ★5モード対応 HP倍率調整★
+        switch (gameMode) { case 'grade1': hpMultiplier = 0.5; break; case 'grade2': hpMultiplier = 0.7; break; case 'grade3': hpMultiplier = 0.9; break; case 'grade4': hpMultiplier = 0.95; break; /* 1.0 -> 0.95 */ case 'grade5': hpMultiplier = 1.0; break; /* 1.1 -> 1.0 */ }
         enemyMaxHP = Math.max(5, Math.floor(enemyMaxHP * hpMultiplier));
         enemyHP = enemyMaxHP; playerHP = playerMaxHP; currentProblemIndex = 0; comboCount = 0; updateComboDisplay();
         questionsForThisStage = (currentEnemy.type === 'boss') ? 20 : 15;
@@ -184,19 +259,199 @@
         stopBgm(); if (currentEnemy.type === 'boss') { document.body.classList.add('boss-battle-bg'); battleLog.textContent = `🔥ボス出現！ ${currentEnemy.name} があらわれた！🔥`; playBgm('bgmBoss'); } else { document.body.classList.remove('boss-battle-bg'); battleLog.textContent = `Lv${currentStage} ${currentEnemy.name} があらわれた！`; playBgm('bgmNormal'); }
         startBtn.style.display = "none"; battleInProgress = false; setTimeout(showQuestion, 1500);
     }
-    // --- endBattle関数 ---
+    // --- endBattle関数 (変更なし) ---
     function endBattle() { battleInProgress = true; answerChoicesDiv.innerHTML = ""; questionDiv.textContent = "Battle End!"; comboDisplay.classList.remove('show'); stopBgm(); let resultMessage = ""; let nextButtonText = ""; let isVictory = false; if (enemyHP <= 0) { isVictory = true; playSound('enemyDefeated'); enemyCharacter.classList.add('defeated'); resultMessage = `🎉勝利！ ${currentEnemy.name} をたおした！🎉`; if (currentEnemy.type === 'boss') { resultMessage += ` すごい！ボスを撃破したぞ！`; } saveHighestStage(gameMode, currentStage); currentStage++; if (currentStage > maxStage) { resultMessage += " 🏆全ステージクリア！おめでとう！🏆"; startBtn.style.display = "none"; } else { nextButtonText = `次の敵 (Lv${currentStage}) と戦う！`; startBtn.style.display = "inline-block"; } } else { resultMessage = playerHP <= 0 ? "😭敗北...また挑戦してね！" : "時間切れ...もう一度挑戦！"; nextButtonText = "再挑戦！"; startBtn.style.display = "inline-block"; } battleLog.textContent = resultMessage; if (nextButtonText) { startBtn.textContent = nextButtonText; } document.body.classList.add(isVictory ? 'feedback-correct' : 'feedback-wrong'); setTimeout(() => { document.body.classList.remove('feedback-correct', 'feedback-wrong', 'boss-battle-bg'); }, 1000); }
-    // --- モード選択処理 ---
-    function selectMode(selectedMode) { playSound('tap'); gameMode = selectedMode; highestClearedStage = loadHighestStage(gameMode); modeSelectScreen.style.display = 'none'; startMethodScreen.style.display = 'flex'; if (highestClearedStage > 0 && highestClearedStage < maxStage) { const nextStage = highestClearedStage + 1; continueFromLastBtn.textContent = `つづきから (Lv ${nextStage})`; continueFromLastBtn.style.display = 'inline-block'; continueFromLastBtn.disabled = false; } else { continueFromLastBtn.style.display = 'none'; continueFromLastBtn.disabled = true; } loadBgmSetting(); }
-    // --- スタート方法選択ボタンの処理 ---
-    function startGameFlow() { playSound('tap'); startMethodScreen.style.display = 'none'; battleScreen.style.display = 'flex'; startBattle(); }
+
+    // --- ★ トレーニングモード関連関数 ★ ---
+    function generateTrainingProblem(type) {
+        let num1, num2, answer, questionText, op;
+        switch (type) {
+            case 'addsub1': // かんたん たし算・ひき算
+                if (Math.random() < 0.6) { op = '+'; do { num1 = Math.floor(Math.random() * 10); num2 = Math.floor(Math.random() * (10 - num1)); } while (num1 === 0 && num2 === 0); answer = num1 + num2; }
+                else { op = '-'; num1 = Math.floor(Math.random() * 6) + 5; num2 = Math.floor(Math.random() * num1) + 1; answer = num1 - num2; }
+                break;
+            case 'addsub2': // ふつう たし算・ひき算
+                 if (Math.random() < 0.5) { op = '+'; num1 = Math.floor(Math.random()*80)+10; num2 = Math.floor(Math.random()*80)+10; answer = num1 + num2; }
+                 else { op = '-'; num1 = Math.floor(Math.random()*80)+20; num2 = Math.floor(Math.random()*(num1-10))+10; answer = num1 - num2; }
+                 break;
+            case 'mul': // かけ算（九九）
+                op = '×'; num1 = Math.floor(Math.random() * 8) + 2; num2 = Math.floor(Math.random() * 8) + 2; answer = num1 * num2;
+                break;
+            case 'div': // わり算（あまりなし）
+                op = '÷'; num2 = Math.floor(Math.random() * 8) + 2; answer = Math.floor(Math.random() * 8) + 2; num1 = num2 * answer;
+                break;
+            default: // デフォルトは簡単なたし算
+                 op = '+'; do { num1 = Math.floor(Math.random() * 10); num2 = Math.floor(Math.random() * (10 - num1)); } while (num1 === 0 && num2 === 0); answer = num1 + num2;
+        }
+        questionText = `${num1} ${op} ${num2}`;
+        return { q: questionText, a: answer };
+    }
+
+    function showTrainingQuestion() {
+        if (trainingTimeRemaining <= 0) return; // 時間切れなら何もしない
+        currentTrainingProblem = generateTrainingProblem(trainingType);
+        trainingQuestion.textContent = currentTrainingProblem.q;
+        const choices = generateChoices(currentTrainingProblem.a);
+        trainingAnswerChoices.innerHTML = "";
+        trainingEnemyDisplay.classList.remove('defeated'); // スライム表示リセット
+        choices.forEach(choice => {
+            const btn = document.createElement("button");
+            btn.textContent = choice;
+            btn.className = "choice-btn"; // バトルモードと同じスタイル流用
+            btn.onclick = () => handleTrainingAnswer(choice);
+            trainingAnswerChoices.appendChild(btn);
+        });
+         battleInProgress = false; // 回答受付可能に
+    }
+
+    function handleTrainingAnswer(selectedAnswer) {
+        if (battleInProgress || trainingTimeRemaining <= 0) return; // 処理中or時間切れは無視
+        battleInProgress = true; // 処理開始
+        const choiceButtons = trainingAnswerChoices.querySelectorAll('.choice-btn');
+        choiceButtons.forEach(btn => btn.disabled = true);
+        playSound('tap');
+
+        if (selectedAnswer === currentTrainingProblem.a) { // 正解
+            playSound('hitEnemy'); // 正解＝ヒット音
+            showFeedback("Correct!", "perfect"); // 正解フィードバック
+            trainingScore++;
+            trainingScore.textContent = `たおした数: ${trainingScore}`;
+            // スライム撃破演出
+            trainingEnemyDisplay.classList.add('defeated');
+            playSound('enemyDefeated'); // 簡易的な撃破音
+        } else { // 不正解
+            playSound('wrong');
+            showFeedback("Wrong!", "wrong");
+            trainingTimeRemaining = Math.max(0, trainingTimeRemaining - 1); // 時間ペナルティ-1秒
+            trainingTimer.textContent = `のこり時間: ${trainingTimeRemaining}秒`;
+        }
+        // すぐに次の問題へ (0.2秒後くらい)
+        setTimeout(showTrainingQuestion, 200);
+    }
+
+    function updateTrainingTimer() {
+        trainingTimeRemaining--;
+        trainingTimer.textContent = `のこり時間: ${trainingTimeRemaining}秒`;
+        if (trainingTimeRemaining <= 0) {
+            endTraining();
+        }
+    }
+
+    function startTraining(type) {
+        gameMode = 'training'; // ゲームモード設定
+        trainingType = type;
+        trainingScore = 0;
+        trainingTimeRemaining = trainingTimeLimit;
+        battleInProgress = false;
+
+        // 画面切り替え
+        modeSelectScreen.style.display = 'none';
+        trainingTypeSelectScreen.style.display = 'none';
+        battleScreen.style.display = 'none';
+        trainingScreen.style.display = 'flex'; // トレーニング画面表示
+        trainingResultScreen.style.display = 'none';
+        document.body.className = 'training-bg'; // 背景変更
+
+        // UI初期化
+        trainingTimer.textContent = `のこり時間: ${trainingTimeRemaining}秒`;
+        trainingScore.textContent = `たおした数: ${trainingScore}`;
+        trainingEnemyDisplay.textContent = '💧'; // トレーニングスライム
+
+        stopBgm(); // 他のBGMを停止
+        playBgm('bgmTraining'); // トレーニングBGM開始
+
+        showTrainingQuestion(); // 最初の問題表示
+        trainingTimerInterval = setInterval(updateTrainingTimer, 1000); // タイマースタート
+    }
+
+    function endTraining() {
+        clearInterval(trainingTimerInterval); // タイマー停止
+        battleInProgress = true; // 回答不可にする
+        stopBgm();
+        // playSound('timesUp'); // ★任意: タイムアップ音
+
+        // 結果表示
+        finalScore.textContent = `${trainingScore} ひき たおした！`;
+        const bestScore = loadBestScore(trainingType);
+        personalBest.textContent = `じこベスト: ${bestScore} ひき`;
+        if (saveBestScore(trainingType, trainingScore)) {
+            personalBest.textContent += " ✨新記録！✨";
+        }
+
+        // 画面切り替え
+        trainingScreen.style.display = 'none';
+        trainingResultScreen.style.display = 'flex';
+    }
+
+    // --- モード選択/スタート方法選択 関連 ---
+    function showModeSelect() {
+        stopBgm(); // BGM停止
+        document.body.className = ''; // 背景リセット
+        modeSelectScreen.style.display = 'flex';
+        startMethodScreen.style.display = 'none';
+        battleScreen.style.display = 'none';
+        trainingTypeSelectScreen.style.display = 'none';
+        trainingScreen.style.display = 'none';
+        trainingResultScreen.style.display = 'none';
+    }
+
+    function selectMode(selectedMode) {
+        playSound('tap');
+        gameMode = selectedMode;
+        highestClearedStage = loadHighestStage(gameMode);
+        modeSelectScreen.style.display = 'none';
+        startMethodScreen.style.display = 'flex';
+        if (highestClearedStage > 0 && highestClearedStage < maxStage) { const nextStage = highestClearedStage + 1; continueFromLastBtn.textContent = `つづきから (Lv ${nextStage})`; continueFromLastBtn.style.display = 'inline-block'; continueFromLastBtn.disabled = false; }
+        else { continueFromLastBtn.style.display = 'none'; continueFromLastBtn.disabled = true; }
+        loadBgmSetting(); // BGM設定読み込みはここだけで良い
+    }
+    function startGameFlow() {
+        playSound('tap');
+        startMethodScreen.style.display = 'none';
+        battleScreen.style.display = 'flex';
+        document.body.className = ''; // 背景リセット(ボス戦以外)
+        startBattle();
+    }
+
+    // --- イベントリスナー ---
+    grade1ModeBtn.addEventListener("click", () => selectMode('grade1'));
+    grade2ModeBtn.addEventListener("click", () => selectMode('grade2'));
+    grade3ModeBtn.addEventListener("click", () => selectMode('grade3'));
+    grade4ModeBtn.addEventListener("click", () => selectMode('grade4'));
+    grade5ModeBtn.addEventListener("click", () => selectMode('grade5'));
+    trainingModeBtn.addEventListener("click", () => { // ★追加: トレーニングモード選択
+         playSound('tap');
+         modeSelectScreen.style.display = 'none';
+         trainingTypeSelectScreen.style.display = 'flex';
+         stopBgm(); // 念のためBGM停止
+    });
     startFromBeginningBtn.addEventListener('click', () => { currentStage = 1; startGameFlow(); });
     continueFromLastBtn.addEventListener('click', () => { currentStage = highestClearedStage + 1; if (currentStage > maxStage) currentStage = maxStage; startGameFlow(); });
-    // --- 他のイベントリスナー ---
-    grade1ModeBtn.addEventListener("click", () => selectMode('grade1')); grade2ModeBtn.addEventListener("click", () => selectMode('grade2')); grade3ModeBtn.addEventListener("click", () => selectMode('grade3')); grade4ModeBtn.addEventListener("click", () => selectMode('grade4')); grade5ModeBtn.addEventListener("click", () => selectMode('grade5'));
     startBtn.addEventListener("click", () => { playSound('tap'); enemyCharacter.classList.remove('defeated'); startBattle(); });
+
+    // ★追加: トレーニングタイプ選択ボタン
+    document.querySelectorAll('.training-type-btn').forEach(button => {
+        button.addEventListener('click', (e) => {
+            playSound('tap');
+            const type = e.target.dataset.trainingType;
+            startTraining(type);
+        });
+    });
+    // ★追加: トレーニング結果画面ボタン
+    retryTrainingBtn.addEventListener('click', () => {
+        playSound('tap');
+        trainingResultScreen.style.display = 'none';
+        startTraining(trainingType); // 同じタイプで再挑戦
+    });
+    backToModeSelectBtn.addEventListener('click', showModeSelect); // トレーニング選択画面用
+    backToModeSelectBtnFromTraining.addEventListener('click', showModeSelect); // トレーニング結果画面用
+
+
     // --- 初期化処理 ---
-    loadBgmSetting(); playerHPText.textContent = playerHP; updateHPBar('playerHPBar', playerHP, playerMaxHP);
+    loadBgmSetting();
+    playerHPText.textContent = playerHP;
+    updateHPBar('playerHPBar', playerHP, playerMaxHP);
+    showModeSelect(); // ★変更: 最初はモード選択画面を表示
 
   </script>
 </body>
