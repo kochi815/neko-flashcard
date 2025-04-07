@@ -533,121 +533,140 @@ function showDamageEffect(damage, isCritical) {
 
           // --- startBattle関数 ---
     function startBattle() { currentEnemy = enemies[currentStage] || enemies[maxStage]; if (!currentEnemy) { console.error("Error: Cannot find enemy data for stage", currentStage); return; } enemyMaxHP = currentEnemy.hp; if (currentEnemy.type === 'boss') { enemyMaxHP = Math.floor(enemyMaxHP * 1.5); } let hpMultiplier = 1.0; switch (gameMode) { case 'grade1': hpMultiplier = 0.5; break; case 'grade2': hpMultiplier = 0.7; break; case 'grade3': hpMultiplier = 0.9; break; case 'grade4': hpMultiplier = 0.95; break; case 'grade5': hpMultiplier = 1.0; break; } enemyMaxHP = Math.max(5, Math.floor(enemyMaxHP * hpMultiplier)); enemyHP = enemyMaxHP; playerHP = playerMaxHP; currentProblemIndex = 0; comboCount = 0; updateComboDisplay(); questionsForThisStage = (currentEnemy.type === 'boss') ? 20 : 15; problems = generateProblems(currentStage, gameMode, questionsForThisStage); if (!problems || problems.length === 0) { console.error("Error: generateProblems returned empty!", {currentStage, gameMode, questionsForThisStage}); battleLog.textContent = "エラー：問題生成失敗"; return; } enemyName.textContent = `${currentEnemy.emoji} ${currentEnemy.name} (Lv${currentStage})`; enemyHPText.textContent = enemyHP; playerHPText.textContent = playerHP; updateHPBar('enemyHPBar', enemyHP, enemyMaxHP); updateHPBar('playerHPBar', playerHP, playerMaxHP); enemyCharacter.textContent = currentEnemy.emoji; enemyCharacter.classList.remove('defeated'); stopBgm(); if (currentEnemy.type === 'boss') { document.body.classList.add('boss-battle-bg'); battleLog.textContent = `🔥ボス出現！ ${currentEnemy.name} があらわれた！🔥`; playBgm('bgmBoss'); } else { document.body.classList.remove('boss-battle-bg'); battleLog.textContent = `Lv${currentStage} ${currentEnemy.name} があらわれた！`; playBgm('bgmNormal'); } startBtn.style.display = "none"; battleInProgress = false; setTimeout(showQuestion, 1500); }
-// --- endBattle関数 --- (ここからコピー・エラー対策版)
+// --- endBattle関数 --- (ここからコピー・ログ追加版)
 function endBattle() {
+    console.log("endBattle: 関数が呼び出されました"); // ★ログ追加
     battleInProgress = true;
     answerChoicesDiv.innerHTML = "";
     questionDiv.textContent = "Battle End!";
     comboDisplay.classList.remove('show');
-    stopBgm(); // BGM停止
+    stopBgm();
 
     let resultMessage = "";
     let nextButtonText = "";
     let isVictory = false;
 
     if (enemyHP <= 0) { // 勝利した場合
+        console.log("endBattle: 勝利条件を満たしました (enemyHP <= 0)"); // ★ログ追加
         isVictory = true;
-        enemyCharacter.classList.add('defeated'); // 敵を消すアニメーション用クラス
+        enemyCharacter.classList.add('defeated');
 
         // ▼▼▼ ボスかどうかで処理を分岐 ▼▼▼
+        console.log("endBattle: 敵タイプをチェックします:", currentEnemy.type); // ★ログ追加
         if (currentEnemy.type === 'boss') {
+            console.log("endBattle: ボス撃破と判定されました"); // ★ログ追加
             // --- ボス撃破時の処理 ---
-            playSound('enemyDefeated'); // ボス撃破音 (既存のものを流用)
+            playSound('enemyDefeated');
 
             // メッセージ表示用の要素にテキストを設定
-            if (bossDefeatedMessage) { // ★nullチェック追加
+            if (bossDefeatedMessage) {
+                console.log("endBattle: bossDefeatedMessage にテキストを設定します"); // ★ログ追加
                 bossDefeatedMessage.textContent = `🎉 ボス ${currentEnemy.name} 撃破！ 🎉`;
             } else {
-                console.error("bossDefeatedMessage element not found!");
+                console.error("endBattle: bossDefeatedMessage が見つかりません！"); // エラーログ
             }
             // オーバーレイを表示状態にする (CSSでアニメーション開始)
-            if (bossDefeatedOverlay) { // ★nullチェック追加
+            if (bossDefeatedOverlay) {
+                console.log("endBattle: bossDefeatedOverlay に 'show' クラスを追加し、表示します"); // ★ログ追加
                 bossDefeatedOverlay.classList.add('show');
                 bossDefeatedOverlay.style.display = 'flex';
             } else {
-                console.error("bossDefeatedOverlay element not found!");
+                console.error("endBattle: bossDefeatedOverlay が見つかりません！"); // エラーログ
             }
 
             // 3秒後に演出を消すタイマーを設定
+            console.log("endBattle: 3秒後にオーバーレイを非表示にするタイマーを設定します"); // ★ログ追加
             setTimeout(() => {
-                if (bossDefeatedOverlay) { // ★nullチェック追加
-                    bossDefeatedOverlay.classList.remove('show'); // showクラスを消して非表示アニメーション開始
+                console.log("endBattle: (3秒経過) オーバーレイ非表示処理を開始します"); // ★ログ追加
+                if (bossDefeatedOverlay) {
+                    bossDefeatedOverlay.classList.remove('show');
                     setTimeout(() => {
-                        bossDefeatedOverlay.style.display = 'none'; // 確実に非表示にする
-                    }, 500); // CSSのtransitionの時間 (0.5秒 = 500ミリ秒)
+                        console.log("endBattle: (さらに0.5秒経過) オーバーレイの display を none にします"); // ★ログ追加
+                        bossDefeatedOverlay.style.display = 'none';
+                    }, 500);
                 }
-            }, 3000); // 3000ミリ秒 = 3秒後に消し始める
+            }, 3000);
 
             // バトルログ用のメッセージ (演出とは別)
             resultMessage = `すごい！ボス ${currentEnemy.name} をたおした！🏆`;
 
         } else {
             // --- 通常の敵撃破時の処理 ---
-            playSound('enemyDefeated'); // 通常の敵撃破音
+            console.log("endBattle: 通常の敵撃破と判定されました"); // ★ログ追加
+            playSound('enemyDefeated');
             resultMessage = `🎉勝利！ ${currentEnemy.name} をたおした！🎉`;
         }
         // ▲▲▲ ボスかどうかの分岐ここまで ▲▲▲
 
-        saveHighestStage(gameMode, currentStage); // 最高到達ステージを保存
-        currentStage++; // 次のステージへ
+        saveHighestStage(gameMode, currentStage);
+        currentStage++;
 
         // 全ステージクリア判定
         if (currentStage > maxStage) {
+             console.log("endBattle: 全ステージクリアしました"); // ★ログ追加
             resultMessage += " 🏆全ステージクリア！おめでとう！🏆";
-            if (startBtn) { // ★nullチェック追加
-                 startBtn.style.display = "none"; // 「次へ」ボタン非表示
+            if (startBtn) {
+                 startBtn.style.display = "none";
             } else {
-                console.error("startBtn element not found when trying to hide!");
+                console.error("endBattle: startBtn (クリア時非表示用) が見つかりません！");
             }
         } else {
+             console.log("endBattle: 次のステージに進みます"); // ★ログ追加
             nextButtonText = `次の敵 (Lv${currentStage}) と戦う！`;
-             if (startBtn) { // ★nullチェック追加
-                startBtn.style.display = "inline-block"; // 「次へ」ボタン表示
+             if (startBtn) {
+                startBtn.style.display = "inline-block";
              } else {
-                 console.error("startBtn element not found when trying to show!");
+                 console.error("endBattle: startBtn (次へ表示用) が見つかりません！");
              }
         }
 
     } else { // 敗北または時間切れの場合
-        isVictory = false; // isVictory フラグを明確に false に
+        console.log("endBattle: 敗北または時間切れと判定されました"); // ★ログ追加
+        isVictory = false;
         resultMessage = playerHP <= 0 ? "😭敗北...また挑戦してね！" : "時間切れ...もう一度挑戦！";
         nextButtonText = "再挑戦！";
-        if (startBtn) { // ★nullチェック追加
-            startBtn.style.display = "inline-block"; // 「再挑戦」ボタン表示
+        if (startBtn) {
+            startBtn.style.display = "inline-block";
         } else {
-            console.error("startBtn element not found when trying to show retry!");
+            console.error("endBattle: startBtn (再挑戦表示用) が見つかりません！");
         }
     }
 
     // バトルログに結果を表示
-    if (battleLog) { // ★ nullチェック追加
+    if (battleLog) {
+        console.log("endBattle: バトルログに結果を表示します:", resultMessage); // ★ログ追加
         battleLog.textContent = resultMessage;
     } else {
-        console.error("battleLog element not found!"); // ★ エラーならコンソールに出力
+        console.error("endBattle: battleLog が見つかりません！");
     }
 
     // ボタンのテキストを設定
     if (nextButtonText) {
-        if (startBtn) { // ★ nullチェック追加
+        if (startBtn) {
+             console.log("endBattle: ボタンテキストを設定します:", nextButtonText); // ★ログ追加
             startBtn.textContent = nextButtonText;
         } else {
-            console.error("startBtn element not found when setting text!"); // ★ エラーならコンソールに出力
+            console.error("endBattle: startBtn (テキスト設定用) が見つかりません！");
         }
     }
 
-    // 背景色のフラッシュ演出 (勝利/敗北で色が変わる)
+    // 背景色のフラッシュ演出
+    console.log("endBattle: 背景フラッシュ演出を開始します"); // ★ログ追加
     document.body.classList.add(isVictory ? 'feedback-correct' : 'feedback-wrong');
     setTimeout(() => {
         document.body.classList.remove('feedback-correct', 'feedback-wrong');
-    }, 1000); // 1秒後にフラッシュ解除
+    }, 1000);
 
     // ボス戦背景だった場合は解除
-    setTimeout(() => {
-        document.body.classList.remove('boss-battle-bg');
-    }, 500); // 少し早めに解除しても良いかも
-
+    if (document.body.classList.contains('boss-battle-bg')) {
+        console.log("endBattle: ボス戦背景を解除します"); // ★ログ追加
+        setTimeout(() => {
+            document.body.classList.remove('boss-battle-bg');
+        }, 500);
+    }
+    console.log("endBattle: 関数終了"); // ★ログ追加
 }
-// --- endBattle関数 --- (ここまでコピー) 
+// --- endBattle関数 --- (ここまでコピー)
       // --- トレーニングモード関連関数 ---
     function generateTrainingProblem(type) { let num1, num2, answer, questionText, op; switch (type) { case 'addsub1': if (Math.random() < 0.6) { op = '+'; do { num1 = Math.floor(Math.random() * 10); num2 = Math.floor(Math.random() * (10 - num1)); } while (num1 === 0 && num2 === 0); answer = num1 + num2; } else { op = '-'; num1 = Math.floor(Math.random() * 6) + 5; num2 = Math.floor(Math.random() * num1) + 1; answer = num1 - num2; } break; case 'addsub2': if (Math.random() < 0.5) { op = '+'; num1 = Math.floor(Math.random()*80)+10; num2 = Math.floor(Math.random()*80)+10; answer = num1 + num2; } else { op = '-'; num1 = Math.floor(Math.random()*80)+20; num2 = Math.floor(Math.random()*(num1-10))+10; answer = num1 - num2; } break; case 'mul': op = '×'; num1 = Math.floor(Math.random() * 8) + 2; num2 = Math.floor(Math.random() * 8) + 2; answer = num1 * num2; break; case 'div': op = '÷'; num2 = Math.floor(Math.random() * 8) + 2; answer = Math.floor(Math.random() * 8) + 2; num1 = num2 * answer; break; default: op = '+'; do { num1 = Math.floor(Math.random() * 10); num2 = Math.floor(Math.random() * (10 - num1)); } while (num1 === 0 && num2 === 0); answer = num1 + num2; } questionText = `${num1} ${op} ${num2}`; return { q: questionText, a: answer }; }
     function showTrainingQuestion() { if (trainingTimeRemaining <= 0) return; currentTrainingProblem = generateTrainingProblem(trainingType); trainingQuestion.textContent = currentTrainingProblem.q; const choices = generateChoices(currentTrainingProblem.a); trainingAnswerChoices.innerHTML = ""; trainingEnemyDisplay.classList.remove('defeated'); choices.forEach(choice => { const btn = document.createElement("button"); btn.textContent = choice; btn.className = "choice-btn"; btn.onclick = () => handleTrainingAnswer(choice); trainingAnswerChoices.appendChild(btn); }); battleInProgress = false; }
