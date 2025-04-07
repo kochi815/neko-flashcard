@@ -204,6 +204,16 @@
              .result-btn { font-size: 1em; padding: 10px 20px; min-width: 130px; }
              #trainingStatus { font-size: 1.2em;}
         }
+        /* --- ボス撃破演出の表示スタイル --- */
+#bossDefeatedOverlay.show {
+    display: flex; /* display:none から flex に変えて表示 */
+    opacity: 1;    /* 透明から完全表示に */
+}
+/* .show クラスが付いたときに、中のメッセージもアニメーションさせる */
+#bossDefeatedOverlay.show #bossDefeatedMessage {
+    opacity: 1;    /* 透明から完全表示に */
+    transform: scale(1); /* 少し拡大しながら表示される感じ */
+}
     </style>
 </head>
 <body>
@@ -274,6 +284,9 @@
     const modeSelectScreen = document.getElementById("modeSelectScreen"); const grade1ModeBtn = document.getElementById("grade1ModeBtn"); const grade2ModeBtn = document.getElementById("grade2ModeBtn"); const grade3ModeBtn = document.getElementById("grade3ModeBtn"); const grade4ModeBtn = document.getElementById("grade4ModeBtn"); const grade5ModeBtn = document.getElementById("grade5ModeBtn"); const trainingModeBtn = document.getElementById("trainingModeBtn"); const startMethodScreen = document.getElementById("startMethodScreen"); const startFromBeginningBtn = document.getElementById("startFromBeginningBtn"); const continueFromLastBtn = document.getElementById("continueFromLastBtn"); const battleScreen = document.getElementById("battleScreen"); const startBtn = document.getElementById("startBtn"); const questionDiv = document.getElementById("question"); const answerChoicesDiv = document.getElementById("answerChoices"); const battleLog = document.getElementById("battleLog"); const enemyArea = document.getElementById("enemyArea"); const enemyName = document.getElementById("enemyName"); const enemyHPText = document.getElementById("enemyHPText"); const enemyHPBar = document.getElementById("enemyHPBar"); const enemyCharacter = document.getElementById("enemyCharacter"); const playerArea = document.getElementById("playerArea"); const playerHPText = document.getElementById("playerHPText"); const playerHPBar = document.getElementById("playerHPBar"); const playerCharacter = document.getElementById("playerCharacter"); const feedbackDisplay = document.getElementById("feedbackDisplay"); const comboDisplay = document.getElementById("comboDisplay"); const bgmToggleBtn = document.getElementById("bgmToggleBtn");
       const damageEffectContainer = document.getElementById('damageEffectContainer'); // ダメージエフェクト表示用のコンテナ
     const trainingTypeSelectScreen = document.getElementById("trainingTypeSelectScreen"); const trainingScreen = document.getElementById("trainingScreen"); const trainingTimer = document.getElementById("trainingTimer"); const trainingScoreDisplay = document.getElementById("trainingScore"); const trainingEnemyDisplay = document.getElementById("trainingEnemyDisplay"); const trainingQuestion = document.getElementById("trainingQuestion"); const trainingAnswerChoices = document.getElementById("trainingAnswerChoices"); const trainingResultScreen = document.getElementById("trainingResultScreen"); const finalScore = document.getElementById("finalScore"); const personalBest = document.getElementById("personalBest"); const retryTrainingBtn = document.getElementById("retryTrainingBtn"); const backToModeSelectBtn = document.getElementById("backToModeSelectBtn"); const backToModeSelectBtnFromTraining = document.getElementById("backToModeSelectBtnFromTraining");
+
+          const bossDefeatedOverlay = document.getElementById('bossDefeatedOverlay'); // ボス撃破演出の背景
+    const bossDefeatedMessage = document.getElementById('bossDefeatedMessage'); // ボス撃破メッセージ表示部分
 
     // --- 効果音とBGM ---
 const sounds = {
@@ -515,12 +528,91 @@ function showDamageEffect(damage, isCritical) {
 
           // --- startBattle関数 ---
     function startBattle() { currentEnemy = enemies[currentStage] || enemies[maxStage]; if (!currentEnemy) { console.error("Error: Cannot find enemy data for stage", currentStage); return; } enemyMaxHP = currentEnemy.hp; if (currentEnemy.type === 'boss') { enemyMaxHP = Math.floor(enemyMaxHP * 1.5); } let hpMultiplier = 1.0; switch (gameMode) { case 'grade1': hpMultiplier = 0.5; break; case 'grade2': hpMultiplier = 0.7; break; case 'grade3': hpMultiplier = 0.9; break; case 'grade4': hpMultiplier = 0.95; break; case 'grade5': hpMultiplier = 1.0; break; } enemyMaxHP = Math.max(5, Math.floor(enemyMaxHP * hpMultiplier)); enemyHP = enemyMaxHP; playerHP = playerMaxHP; currentProblemIndex = 0; comboCount = 0; updateComboDisplay(); questionsForThisStage = (currentEnemy.type === 'boss') ? 20 : 15; problems = generateProblems(currentStage, gameMode, questionsForThisStage); if (!problems || problems.length === 0) { console.error("Error: generateProblems returned empty!", {currentStage, gameMode, questionsForThisStage}); battleLog.textContent = "エラー：問題生成失敗"; return; } enemyName.textContent = `${currentEnemy.emoji} ${currentEnemy.name} (Lv${currentStage})`; enemyHPText.textContent = enemyHP; playerHPText.textContent = playerHP; updateHPBar('enemyHPBar', enemyHP, enemyMaxHP); updateHPBar('playerHPBar', playerHP, playerMaxHP); enemyCharacter.textContent = currentEnemy.emoji; enemyCharacter.classList.remove('defeated'); stopBgm(); if (currentEnemy.type === 'boss') { document.body.classList.add('boss-battle-bg'); battleLog.textContent = `🔥ボス出現！ ${currentEnemy.name} があらわれた！🔥`; playBgm('bgmBoss'); } else { document.body.classList.remove('boss-battle-bg'); battleLog.textContent = `Lv${currentStage} ${currentEnemy.name} があらわれた！`; playBgm('bgmNormal'); } startBtn.style.display = "none"; battleInProgress = false; setTimeout(showQuestion, 1500); }
-    // --- endBattle関数 ---
-    function endBattle() { battleInProgress = true; answerChoicesDiv.innerHTML = ""; questionDiv.textContent = "Battle End!"; comboDisplay.classList.remove('show'); stopBgm(); let resultMessage = ""; let nextButtonText = ""; let isVictory = false; if (enemyHP <= 0) { isVictory = true; playSound('enemyDefeated'); enemyCharacter.classList.add('defeated'); resultMessage = `🎉勝利！ ${currentEnemy.name} をたおした！🎉`; if (currentEnemy.type === 'boss') { resultMessage += ` すごい！ボスを撃破したぞ！`; } saveHighestStage(gameMode, currentStage); currentStage++; if (currentStage > maxStage) { resultMessage += " 🏆全ステージクリア！おめでとう！🏆"; startBtn.style.display = "none"; } else { nextButtonText = `次の敵 (Lv${currentStage}) と戦う！`; startBtn.style.display = "inline-block"; } } else { resultMessage = playerHP <= 0 ? "😭敗北...また挑戦してね！" : "時間切れ...もう一度挑戦！"; nextButtonText = "再挑戦！"; startBtn.style.display = "inline-block"; } battleLog.textContent = resultMessage; if (nextButtonText) { startBtn.textContent = nextButtonText; } document.body.classList.add(isVictory ? 'feedback-correct' : 'feedback-wrong'); setTimeout(() => { document.body.classList.remove('feedback-correct', 'feedback-wrong', 'boss-battle-bg'); }, 1000); }
+// --- endBattle関数 --- (ここからコピー)
+function endBattle() {
+    battleInProgress = true;
+    answerChoicesDiv.innerHTML = "";
+    questionDiv.textContent = "Battle End!";
+    comboDisplay.classList.remove('show');
+    stopBgm(); // BGM停止
+
+    let resultMessage = "";
+    let nextButtonText = "";
+    let isVictory = false;
+
+    if (enemyHP <= 0) { // 勝利した場合
+        isVictory = true;
+        enemyCharacter.classList.add('defeated'); // 敵を消すアニメーション用クラス
+
+        // ▼▼▼ ボスかどうかで処理を分岐 ▼▼▼
+        if (currentEnemy.type === 'boss') {
+            // --- ボス撃破時の処理 ---
+            playSound('enemyDefeated'); // ボス撃破音 (既存のものを流用)
+
+            // メッセージ表示用の要素にテキストを設定
+            bossDefeatedMessage.textContent = `🎉 ボス ${currentEnemy.name} 撃破！ 🎉`;
+            // オーバーレイを表示状態にする (CSSでアニメーション開始)
+            bossDefeatedOverlay.classList.add('show');
+
+            // 3秒後に演出を消すタイマーを設定
+            setTimeout(() => {
+                bossDefeatedOverlay.classList.remove('show'); // showクラスを消して非表示アニメーション開始
+            }, 3000); // 3000ミリ秒 = 3秒
+
+            // バトルログ用のメッセージ (演出とは別)
+            resultMessage = `すごい！ボス ${currentEnemy.name} をたおした！🏆`;
+
+        } else {
+            // --- 通常の敵撃破時の処理 ---
+            playSound('enemyDefeated'); // 通常の敵撃破音
+            resultMessage = `🎉勝利！ ${currentEnemy.name} をたおした！🎉`;
+        }
+        // ▲▲▲ ボスかどうかの分岐ここまで ▲▲▲
+
+        saveHighestStage(gameMode, currentStage); // 最高到達ステージを保存
+        currentStage++; // 次のステージへ
+
+        // 全ステージクリア判定
+        if (currentStage > maxStage) {
+            resultMessage += " 🏆全ステージクリア！おめでとう！🏆";
+            startBtn.style.display = "none"; // 「次へ」ボタン非表示
+        } else {
+            nextButtonText = `次の敵 (Lv${currentStage}) と戦う！`;
+            startBtn.style.display = "inline-block"; // 「次へ」ボタン表示
+        }
+
+    } else { // 敗北または時間切れの場合
+        isVictory = false; // isVictory フラグを明確に false に
+        resultMessage = playerHP <= 0 ? "😭敗北...また挑戦してね！" : "時間切れ...もう一度挑戦！";
+        nextButtonText = "再挑戦！";
+        startBtn.style.display = "inline-block"; // 「再挑戦」ボタン表示
+    }
+
+    // バトルログに結果を表示
+    battleLog.textContent = resultMessage;
+    // ボタンのテキストを設定
+    if (nextButtonText) {
+        startBtn.textContent = nextButtonText;
+    }
+
+    // 背景色のフラッシュ演出 (勝利/敗北で色が変わる)
+    // ボス撃破演出とタイミングが重なる可能性があるので調整が必要なら行う
+    document.body.classList.add(isVictory ? 'feedback-correct' : 'feedback-wrong');
+    setTimeout(() => {
+        document.body.classList.remove('feedback-correct', 'feedback-wrong');
+    }, 1000); // 1秒後にフラッシュ解除
+
+    // ボス戦背景だった場合は解除
+    setTimeout(() => {
+        document.body.classList.remove('boss-battle-bg');
+    }, 500); // 少し早めに解除しても良いかも
+
+}
+// --- endBattle関数 --- (ここまでコピー)
     // --- トレーニングモード関連関数 ---
     function generateTrainingProblem(type) { let num1, num2, answer, questionText, op; switch (type) { case 'addsub1': if (Math.random() < 0.6) { op = '+'; do { num1 = Math.floor(Math.random() * 10); num2 = Math.floor(Math.random() * (10 - num1)); } while (num1 === 0 && num2 === 0); answer = num1 + num2; } else { op = '-'; num1 = Math.floor(Math.random() * 6) + 5; num2 = Math.floor(Math.random() * num1) + 1; answer = num1 - num2; } break; case 'addsub2': if (Math.random() < 0.5) { op = '+'; num1 = Math.floor(Math.random()*80)+10; num2 = Math.floor(Math.random()*80)+10; answer = num1 + num2; } else { op = '-'; num1 = Math.floor(Math.random()*80)+20; num2 = Math.floor(Math.random()*(num1-10))+10; answer = num1 - num2; } break; case 'mul': op = '×'; num1 = Math.floor(Math.random() * 8) + 2; num2 = Math.floor(Math.random() * 8) + 2; answer = num1 * num2; break; case 'div': op = '÷'; num2 = Math.floor(Math.random() * 8) + 2; answer = Math.floor(Math.random() * 8) + 2; num1 = num2 * answer; break; default: op = '+'; do { num1 = Math.floor(Math.random() * 10); num2 = Math.floor(Math.random() * (10 - num1)); } while (num1 === 0 && num2 === 0); answer = num1 + num2; } questionText = `${num1} ${op} ${num2}`; return { q: questionText, a: answer }; }
     function showTrainingQuestion() { if (trainingTimeRemaining <= 0) return; currentTrainingProblem = generateTrainingProblem(trainingType); trainingQuestion.textContent = currentTrainingProblem.q; const choices = generateChoices(currentTrainingProblem.a); trainingAnswerChoices.innerHTML = ""; trainingEnemyDisplay.classList.remove('defeated'); choices.forEach(choice => { const btn = document.createElement("button"); btn.textContent = choice; btn.className = "choice-btn"; btn.onclick = () => handleTrainingAnswer(choice); trainingAnswerChoices.appendChild(btn); }); battleInProgress = false; }
-    function handleTrainingAnswer(selectedAnswer) { if (battleInProgress || trainingTimeRemaining <= 0) return; battleInProgress = true; const choiceButtons = trainingAnswerChoices.querySelectorAll('.choice-btn'); choiceButtons.forEach(btn => btn.disabled = true); playSound('tap'); if (selectedAnswer === currentTrainingProblem.a) { playSound('hitEnemy'); showFeedback("Correct!", "perfect"); trainingScore++; trainingScoreDisplay.textContent = `たおした数: ${trainingScore}`; trainingEnemyDisplay.classList.add('defeated'); playSound('enemyDefeated'); } else { playSound('wrong'); showFeedback("Wrong!", "wrong"); trainingTimeRemaining = Math.max(0, trainingTimeRemaining - 1); trainingTimer.textContent = `のこり時間: ${trainingTimeRemaining}秒`; } setTimeout(showTrainingQuestion, 200); }
+    function handleTrainingAnswer(selectedAnswer) { if (battleInProgress || trainingTimeRemaining <= 0) return; battleInProgress = true; const choiceButtons = trainingAnswerChoices.querySelectorAll('.choice-btn'); choiceButtons.forEach(btn => btn.disabled = true); playSound('tap'); if (selectedAnswer === currentTrainingProblem.a) { playSound('hit_perfect'); showFeedback("Correct!", "perfect"); trainingScore++; trainingScoreDisplay.textContent = `たおした数: ${trainingScore}`; trainingEnemyDisplay.classList.add('defeated'); playSound('enemyDefeated'); } else { playSound('wrong'); showFeedback("Wrong!", "wrong"); trainingTimeRemaining = Math.max(0, trainingTimeRemaining - 1); trainingTimer.textContent = `のこり時間: ${trainingTimeRemaining}秒`; } setTimeout(showTrainingQuestion, 200); }
     function updateTrainingTimer() { trainingTimeRemaining--; trainingTimer.textContent = `のこり時間: ${trainingTimeRemaining}秒`; if (trainingTimeRemaining <= 0) { endTraining(); } }
     function startTraining(type) { gameMode = 'training'; trainingType = type; trainingScore = 0; trainingTimeRemaining = trainingTimeLimit; battleInProgress = false; modeSelectScreen.style.display = 'none'; trainingTypeSelectScreen.style.display = 'none'; battleScreen.style.display = 'none'; trainingScreen.style.display = 'flex'; trainingResultScreen.style.display = 'none'; document.body.className = 'training-bg'; trainingTimer.textContent = `のこり時間: ${trainingTimeRemaining}秒`; trainingScoreDisplay.textContent = `たおした数: ${trainingScore}`; trainingEnemyDisplay.textContent = '💧'; stopBgm(); playBgm('bgmTraining'); showTrainingQuestion(); trainingTimerInterval = setInterval(updateTrainingTimer, 1000); }
     function endTraining() { clearInterval(trainingTimerInterval); battleInProgress = true; stopBgm(); finalScore.textContent = `${trainingScore} ひき たおした！`; const bestScore = loadBestScore(trainingType); personalBest.textContent = `じこベスト: ${bestScore} ひき`; if (saveBestScore(trainingType, trainingScore)) { personalBest.textContent += " ✨新記録！✨"; } trainingScreen.style.display = 'none'; trainingResultScreen.style.display = 'flex'; }
@@ -542,5 +634,10 @@ function showDamageEffect(damage, isCritical) {
     loadBgmSetting(); playerHPText.textContent = playerHP; updateHPBar('playerHPBar', playerHP, playerMaxHP); showModeSelect();
 
   </script>
+    <div id="bossDefeatedOverlay" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.7); justify-content: center; align-items: center; z-index: 50; opacity: 0; transition: opacity 0.5s ease-in-out;">
+        <div id="bossDefeatedMessage" style="font-size: clamp(2em, 8vw, 4em); color: #ffd700; font-weight: bold; text-shadow: 3px 3px 5px rgba(0,0,0,0.8); text-align: center; transform: scale(0.5); opacity: 0; transition: transform 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55), opacity 0.3s ease-out;">
+            </div>
+    </div>
+    ```
 </body>
 </html>
