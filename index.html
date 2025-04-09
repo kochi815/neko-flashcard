@@ -284,7 +284,8 @@
     const BGM_KEY = 'nekobattle_bgmEnabled_v1'; let questionsForThisStage = 15;
     const HIGHEST_STAGE_KEY_PREFIX = 'nekobattle_highestStage_'; let highestClearedStage = 0;
     let trainingType = ''; let trainingTimeLimit = 60; let trainingTimeRemaining = trainingTimeLimit; let trainingScore = 0; let trainingTimerInterval = null; const BEST_SCORE_KEY_PREFIX = 'nekobattle_bestScore_'; let currentTrainingProblem = null;
-
+let currentTrainingProblem = null;
+let comboDisplayTimeoutId = null; // ★追加: コンボ表示を消すタイマーID用
     // --- DOM要素取得 ---
     const modeSelectScreen = document.getElementById("modeSelectScreen"); const grade1ModeBtn = document.getElementById("grade1ModeBtn"); const grade2ModeBtn = document.getElementById("grade2ModeBtn"); const grade3ModeBtn = document.getElementById("grade3ModeBtn"); const grade4ModeBtn = document.getElementById("grade4ModeBtn"); const grade5ModeBtn = document.getElementById("grade5ModeBtn"); const trainingModeBtn = document.getElementById("trainingModeBtn"); const startMethodScreen = document.getElementById("startMethodScreen"); const startFromBeginningBtn = document.getElementById("startFromBeginningBtn"); const continueFromLastBtn = document.getElementById("continueFromLastBtn"); const battleScreen = document.getElementById("battleScreen"); const startBtn = document.getElementById("startBtn"); const questionDiv = document.getElementById("question"); const answerChoicesDiv = document.getElementById("answerChoices"); const battleLog = document.getElementById("battleLog"); const enemyArea = document.getElementById("enemyArea"); const enemyName = document.getElementById("enemyName"); const enemyHPText = document.getElementById("enemyHPText"); const enemyHPBar = document.getElementById("enemyHPBar"); const enemyCharacter = document.getElementById("enemyCharacter"); const playerArea = document.getElementById("playerArea"); const playerHPText = document.getElementById("playerHPText"); const playerHPBar = document.getElementById("playerHPBar"); const playerCharacter = document.getElementById("playerCharacter"); const feedbackDisplay = document.getElementById("feedbackDisplay"); const comboDisplay = document.getElementById("comboDisplay"); const bgmToggleBtn = document.getElementById("bgmToggleBtn");
       const damageEffectContainer = document.getElementById('damageEffectContainer'); // ダメージエフェクト表示用のコンテナ
@@ -360,9 +361,36 @@ const sounds = {
     function shakeCharacter(elementId) { const characterElement = document.getElementById(elementId); characterElement.classList.add('shake-animation'); setTimeout(() => { characterElement.classList.remove('shake-animation'); }, 200); }
     // --- 時間評価表示関数 ---
     function showFeedback(text, type) { feedbackDisplay.textContent = text; feedbackDisplay.className = 'show ' + type; setTimeout(() => { feedbackDisplay.className = ''; }, 800); }
-    // --- コンボ表示更新関数 ---
-    function updateComboDisplay() { if (comboCount >= 3) { comboDisplay.textContent = `${comboCount} Combo!`; comboDisplay.classList.remove('great-combo', 'amazing-combo'); if (comboCount >= 10) { comboDisplay.classList.add('amazing-combo'); } else if (comboCount >= 5) { comboDisplay.classList.add('great-combo'); } comboDisplay.classList.add('show'); } else { comboDisplay.classList.remove('show'); } }
-    // --- showQuestion関数 ---
+// --- コンボ表示更新関数 --- (ここからコピー・自動消去版)
+function updateComboDisplay() {
+    // ★ 既存のタイマーがあればクリア (連続でコンボした時に前のタイマーが残らないように)
+    if (comboDisplayTimeoutId) {
+        clearTimeout(comboDisplayTimeoutId);
+        comboDisplayTimeoutId = null;
+    }
+
+    if (comboCount >= 3) { // コンボが3以上なら表示処理
+        comboDisplay.textContent = `${comboCount} Combo!`;
+        comboDisplay.classList.remove('great-combo', 'amazing-combo'); // 色クラスをリセット
+        if (comboCount >= 10) {
+            comboDisplay.classList.add('amazing-combo');
+        } else if (comboCount >= 5) {
+            comboDisplay.classList.add('great-combo');
+        }
+        comboDisplay.classList.add('show'); // 表示クラスを追加
+
+        // ★ 自動で消すタイマーを設定 (1.5秒後に 'show' クラスを削除)
+        comboDisplayTimeoutId = setTimeout(() => {
+            comboDisplay.classList.remove('show');
+            comboDisplayTimeoutId = null; // タイマーIDをリセット
+            // console.log("Combo display hidden by timeout"); // デバッグ用ログ(必要なら)
+        }, 1500); // 1500ミリ秒 = 1.5秒 (この時間は調整可能です)
+
+    } else { // コンボが3未満なら非表示
+        comboDisplay.classList.remove('show'); // 表示クラスを削除 (タイマーは既になければ何もしない)
+    }
+}
+// --- コンボ表示更新関数 --- (ここまでコピー)    // --- showQuestion関数 ---
     function showQuestion() { battleInProgress = false; if (currentProblemIndex >= questionsForThisStage || playerHP <= 0 || enemyHP <= 0) { endBattle(); return; } if (!problems || problems.length <= currentProblemIndex) { console.error("Error: problems array invalid.", problems, currentProblemIndex); battleLog.textContent = "エラー：問題準備エラー"; endBattle(); return; } const p = problems[currentProblemIndex]; if (!p || typeof p.q === 'undefined' || typeof p.a === 'undefined') { console.error("Error: Invalid problem data.", p); battleLog.textContent = "エラー：問題データ不正"; endBattle(); return; } questionDiv.textContent = p.q; questionStartTime = Date.now(); battleLog.textContent = `Lv${currentStage} (${currentProblemIndex + 1}/${questionsForThisStage}) 問題！`; const choices = generateChoices(p.a); answerChoicesDiv.innerHTML = ""; if (Array.isArray(choices)) { choices.forEach(choice => { const btn = document.createElement("button"); btn.textContent = choice; btn.className = "choice-btn"; btn.onclick = () => handleAnswer(choice); answerChoicesDiv.appendChild(btn); }); } else { console.error("Error: choices not an array.", choices); battleLog.textContent = "エラー：選択肢生成失敗"; endBattle(); } }
      // --- ダメージエフェクト表示関数 --- (ここからコピー)
 function showDamageEffect(damage, isCritical) {
@@ -397,52 +425,115 @@ function showDamageEffect(damage, isCritical) {
 }
 // --- ダメージエフェクト表示関数 --- (ここまでコピー)
 
-      // --- handleAnswer関数 ---
-    function handleAnswer(selectedAnswer) {
-        if (battleInProgress) return;
-        battleInProgress = true;
-        const choiceButtons = answerChoicesDiv.querySelectorAll('.choice-btn');
-        choiceButtons.forEach(btn => btn.disabled = true);
-        playSound('tap');
-        const elapsed = (Date.now() - questionStartTime) / 1000;
-        const p = problems[currentProblemIndex];
-        let feedbackClass = '';
-        let damageToEnemy = 0;
-        let damageToPlayer = 0;
-        let logMessage = "";
-        let feedbackText = "";
-        let feedbackType = "";
-        let isCritical = false;
-        let criticalTime, perfectTime, greatTime, goodTime, slowPenalty, wrongPenalty, baseDmgCrit, baseDmgPerf, baseDmgGreat, baseDmgGood;
+// --- handleAnswer関数 --- (ここからコピー・タイマークリア追加版)
+function handleAnswer(selectedAnswer) {
+    if (battleInProgress) return;
+    battleInProgress = true;
+    const choiceButtons = answerChoicesDiv.querySelectorAll('.choice-btn');
+    choiceButtons.forEach(btn => btn.disabled = true);
+    playSound('tap');
+    const elapsed = (Date.now() - questionStartTime) / 1000;
+    const p = problems[currentProblemIndex];
+    let feedbackClass = '';
+    let damageToEnemy = 0;
+    let damageToPlayer = 0;
+    let logMessage = "";
+    let feedbackText = "";
+    let feedbackType = "";
+    let isCritical = false;
+    let criticalTime, perfectTime, greatTime, goodTime, slowPenalty, wrongPenalty, baseDmgCrit, baseDmgPerf, baseDmgGreat, baseDmgGood;
 
-        // モードごとの評価基準とダメージ設定
-        switch (gameMode) {
-            case 'grade1': criticalTime = 3.0; perfectTime = 5.0; greatTime = 7.0; goodTime = 10.0; slowPenalty = 0; wrongPenalty = 1; baseDmgCrit = 6; baseDmgPerf = 4; baseDmgGreat = 2; baseDmgGood = 1; break;
-            case 'grade2': criticalTime = 2.0; perfectTime = 3.5; greatTime = 5.0; goodTime = 7.5; slowPenalty = 1; wrongPenalty = 1; baseDmgCrit = 6; baseDmgPerf = 4; baseDmgGreat = 2; baseDmgGood = 1; break;
-            case 'grade3': criticalTime = 1.5; perfectTime = 2.5; greatTime = 4.0; goodTime = 6.0; slowPenalty = 1; wrongPenalty = 2; baseDmgCrit = 5; baseDmgPerf = 3; baseDmgGreat = 2; baseDmgGood = 1; break;
-            case 'grade4': criticalTime = 1.5; perfectTime = 2.5; greatTime = 4.0; goodTime = 6.0; slowPenalty = 1; wrongPenalty = 2; baseDmgCrit = 5; baseDmgPerf = 3; baseDmgGreat = 2; baseDmgGood = 1; break;
-            case 'grade5': criticalTime = 1.5; perfectTime = 2.5; greatTime = 4.0; goodTime = 6.0; slowPenalty = 1; wrongPenalty = 2; baseDmgCrit = 5; baseDmgPerf = 3; baseDmgGreat = 2; baseDmgGood = 1; break;
-            default: criticalTime = 1.5; perfectTime = 2.5; greatTime = 4.0; goodTime = 6.0; slowPenalty = 1; wrongPenalty = 2; baseDmgCrit = 5; baseDmgPerf = 3; baseDmgGreat = 2; baseDmgGood = 1;
+    // モードごとの評価基準とダメージ設定 (ここは変更なし)
+    switch (gameMode) {
+        case 'grade1': criticalTime = 3.0; perfectTime = 5.0; greatTime = 7.0; goodTime = 10.0; slowPenalty = 0; wrongPenalty = 1; baseDmgCrit = 6; baseDmgPerf = 4; baseDmgGreat = 2; baseDmgGood = 1; break;
+        case 'grade2': criticalTime = 2.0; perfectTime = 3.5; greatTime = 5.0; goodTime = 7.5; slowPenalty = 1; wrongPenalty = 1; baseDmgCrit = 6; baseDmgPerf = 4; baseDmgGreat = 2; baseDmgGood = 1; break;
+        case 'grade3': criticalTime = 1.5; perfectTime = 2.5; greatTime = 4.0; goodTime = 6.0; slowPenalty = 1; wrongPenalty = 2; baseDmgCrit = 5; baseDmgPerf = 3; baseDmgGreat = 2; baseDmgGood = 1; break;
+        case 'grade4': criticalTime = 1.5; perfectTime = 2.5; greatTime = 4.0; goodTime = 6.0; slowPenalty = 1; wrongPenalty = 2; baseDmgCrit = 5; baseDmgPerf = 3; baseDmgGreat = 2; baseDmgGood = 1; break;
+        case 'grade5': criticalTime = 1.5; perfectTime = 2.5; greatTime = 4.0; goodTime = 6.0; slowPenalty = 1; wrongPenalty = 2; baseDmgCrit = 5; baseDmgPerf = 3; baseDmgGreat = 2; baseDmgGood = 1; break;
+        default: criticalTime = 1.5; perfectTime = 2.5; greatTime = 4.0; goodTime = 6.0; slowPenalty = 1; wrongPenalty = 2; baseDmgCrit = 5; baseDmgPerf = 3; baseDmgGreat = 2; baseDmgGood = 1;
+    }
+
+    // 正解判定
+    if (selectedAnswer === p.a) {
+        comboCount++;
+        let baseDamage = 0;
+
+        if (elapsed < criticalTime) {
+            baseDamage = baseDmgCrit; logMessage = `✨Critical Hit!✨ (${elapsed.toFixed(1)}秒) `; feedbackText = "Critical Hit!"; feedbackType = "critical"; isCritical = true;
+        } else if (elapsed < perfectTime) {
+            baseDamage = baseDmgPerf; logMessage = `Perfect! (${elapsed.toFixed(1)}秒) `; feedbackText = "Perfect!"; feedbackType = "perfect";
+        } else if (elapsed < greatTime) {
+            baseDamage = baseDmgGreat; logMessage = `Great! (${elapsed.toFixed(1)}秒) `; feedbackText = "Great!"; feedbackType = "great";
+        } else if (elapsed < goodTime) {
+            baseDamage = baseDmgGood; logMessage = `Good (${elapsed.toFixed(1)}秒) `; feedbackText = "Good"; feedbackType = "good";
+        } else { // 時間がかかりすぎた場合
+            damageToPlayer = slowPenalty; logMessage = `Too slow... (${elapsed.toFixed(1)}秒) ${damageToPlayer > 0 ? `自分に${damageToPlayer}ダメージ!` : 'ダメージなし'}`; feedbackText = "Too Slow..."; feedbackType = "slow";
+            comboCount = 0; // コンボリセット
+            // ★ タイマーがあればクリア
+            if (comboDisplayTimeoutId) {
+                clearTimeout(comboDisplayTimeoutId);
+                comboDisplayTimeoutId = null;
+            }
         }
 
-        // 正解判定
-        if (selectedAnswer === p.a) {
-            comboCount++;
-            let baseDamage = 0;
+        let comboBonus = 0;
+        if (comboCount >= 5) comboBonus = 2; else if (comboCount >= 3) comboBonus = 1;
+        damageToEnemy = baseDamage + comboBonus;
 
-            // 時間による評価と基本ダメージ決定
-            if (elapsed < criticalTime) {
-                baseDamage = baseDmgCrit; logMessage = `✨Critical Hit!✨ (${elapsed.toFixed(1)}秒) `; feedbackText = "Critical Hit!"; feedbackType = "critical"; isCritical = true;
-            } else if (elapsed < perfectTime) {
-                baseDamage = baseDmgPerf; logMessage = `Perfect! (${elapsed.toFixed(1)}秒) `; feedbackText = "Perfect!"; feedbackType = "perfect";
-            } else if (elapsed < greatTime) {
-                baseDamage = baseDmgGreat; logMessage = `Great! (${elapsed.toFixed(1)}秒) `; feedbackText = "Great!"; feedbackType = "great";
-            } else if (elapsed < goodTime) {
-                baseDamage = baseDmgGood; logMessage = `Good (${elapsed.toFixed(1)}秒) `; feedbackText = "Good"; feedbackType = "good";
-            } else { // 時間がかかりすぎた場合
-                damageToPlayer = slowPenalty; logMessage = `Too slow... (${elapsed.toFixed(1)}秒) ${damageToPlayer > 0 ? `自分に${damageToPlayer}ダメージ!` : 'ダメージなし'}`; feedbackText = "Too Slow..."; feedbackType = "slow";
-                comboCount = 0; // コンボリセット
-            }
+        if (damageToEnemy > 0) {
+            logMessage += `敵に${damageToEnemy}ダメージ!`;
+            if (comboCount >= 3) logMessage += ` (${comboCount} Combo!)`;
+            feedbackClass = 'feedback-flash';
+            shakeCharacter('enemyCharacter');
+            if (isCritical) { playSound('hitCritical'); } else if (feedbackType === "perfect") { playSound('hitPerfect'); } else if (feedbackType === "great") { playSound('hitGreat'); } else if (feedbackType === "good") { playSound('hitGood'); }
+            showDamageEffect(damageToEnemy, isCritical);
+            if (comboCount === 5 || comboCount === 10 || comboCount === 15) { playSound('comboMilestone'); }
+        } else if (damageToPlayer > 0) { // Too slow でダメージありの場合
+            feedbackClass = 'feedback-damage-player';
+            shakeCharacter('playerCharacter');
+            playSound('hitPlayer');
+        } else { // ダメージが発生しない正解の場合
+            feedbackClass = 'feedback-correct';
+        }
+    } else { // 不正解の場合
+        playSound('wrong');
+        damageToPlayer = wrongPenalty;
+        logMessage = `Wrong! 自分に${damageToPlayer}ダメージ!`;
+        feedbackText = "Wrong!";
+        feedbackType = "wrong";
+        feedbackClass = 'feedback-wrong';
+        comboCount = 0; // コンボリセット
+         // ★ タイマーがあればクリア
+        if (comboDisplayTimeoutId) {
+            clearTimeout(comboDisplayTimeoutId);
+            comboDisplayTimeoutId = null;
+        }
+        shakeCharacter('playerCharacter');
+        playSound('hitPlayer');
+    }
+
+    updateComboDisplay(); // コンボ表示更新 (ここで新しいタイマーがセットされる or 表示が消える)
+
+    enemyHP -= damageToEnemy;
+    playerHP -= damageToPlayer;
+    enemyHPText.textContent = Math.max(0, enemyHP);
+    playerHPText.textContent = Math.max(0, playerHP);
+    updateHPBar('enemyHPBar', enemyHP, enemyMaxHP);
+    updateHPBar('playerHPBar', playerHP, playerMaxHP);
+    battleLog.textContent = logMessage;
+    if(feedbackText) showFeedback(feedbackText, feedbackType);
+    if (feedbackClass) { document.body.classList.add(feedbackClass); setTimeout(() => { document.body.classList.remove(feedbackClass); }, 150); }
+
+    currentProblemIndex++;
+    setTimeout(() => {
+        if (playerHP <= 0 || enemyHP <= 0 || currentProblemIndex >= questionsForThisStage) {
+            endBattle();
+        } else {
+            showQuestion();
+        }
+    }, 1000);
+}
+// --- handleAnswer関数 --- (ここまでコピー)
 
             // コンボボーナス計算
             let comboBonus = 0;
@@ -534,14 +625,20 @@ function showDamageEffect(damage, isCritical) {
           // --- startBattle関数 ---
     function startBattle() { currentEnemy = enemies[currentStage] || enemies[maxStage]; if (!currentEnemy) { console.error("Error: Cannot find enemy data for stage", currentStage); return; } enemyMaxHP = currentEnemy.hp; if (currentEnemy.type === 'boss') { enemyMaxHP = Math.floor(enemyMaxHP * 1.5); } let hpMultiplier = 1.0; switch (gameMode) { case 'grade1': hpMultiplier = 0.5; break; case 'grade2': hpMultiplier = 0.7; break; case 'grade3': hpMultiplier = 0.9; break; case 'grade4': hpMultiplier = 0.95; break; case 'grade5': hpMultiplier = 1.0; break; } enemyMaxHP = Math.max(5, Math.floor(enemyMaxHP * hpMultiplier)); enemyHP = enemyMaxHP; playerHP = playerMaxHP; currentProblemIndex = 0; comboCount = 0; updateComboDisplay(); questionsForThisStage = (currentEnemy.type === 'boss') ? 20 : 15; problems = generateProblems(currentStage, gameMode, questionsForThisStage); if (!problems || problems.length === 0) { console.error("Error: generateProblems returned empty!", {currentStage, gameMode, questionsForThisStage}); battleLog.textContent = "エラー：問題生成失敗"; return; } enemyName.textContent = `${currentEnemy.emoji} ${currentEnemy.name} (Lv${currentStage})`; enemyHPText.textContent = enemyHP; playerHPText.textContent = playerHP; updateHPBar('enemyHPBar', enemyHP, enemyMaxHP); updateHPBar('playerHPBar', playerHP, playerMaxHP); enemyCharacter.textContent = currentEnemy.emoji; enemyCharacter.classList.remove('defeated'); stopBgm(); if (currentEnemy.type === 'boss') { document.body.classList.add('boss-battle-bg'); battleLog.textContent = `🔥ボス出現！ ${currentEnemy.name} があらわれた！🔥`; playBgm('bgmBoss'); } else { document.body.classList.remove('boss-battle-bg'); battleLog.textContent = `Lv${currentStage} ${currentEnemy.name} があらわれた！`; playBgm('bgmNormal'); } startBtn.style.display = "none"; battleInProgress = false; setTimeout(showQuestion, 1500); }
 
-      // --- endBattle関数 --- (ここからコピー・直接スタイル変更版)
+// --- endBattle関数 --- (ここからコピー・タイマークリア追加版)
 function endBattle() {
     console.log("endBattle: 関数が呼び出されました");
     battleInProgress = true;
     answerChoicesDiv.innerHTML = "";
     questionDiv.textContent = "Battle End!";
-    comboDisplay.classList.remove('show');
-    stopBgm();
+    comboDisplay.classList.remove('show'); // コンボ表示を消す
+    // ★ コンボ表示タイマーが残っていればクリア
+    if (comboDisplayTimeoutId) {
+        clearTimeout(comboDisplayTimeoutId);
+        comboDisplayTimeoutId = null;
+        console.log("endBattle: Combo display timeout cleared on battle end."); // ログ追加
+    }
+    stopBgm(); // BGM停止
 
     let resultMessage = "";
     let nextButtonText = "";
@@ -557,47 +654,13 @@ function endBattle() {
             console.log("endBattle: ボス撃破と判定されました");
             playSound('enemyDefeated');
 
-            if (bossDefeatedMessage) {
-                console.log("endBattle: bossDefeatedMessage にテキストを設定します");
-                bossDefeatedMessage.textContent = `🎉 ボス ${currentEnemy.name} 撃破！ 🎉`;
-            } else {
-                console.error("endBattle: bossDefeatedMessage が見つかりません！");
-            }
+            if (bossDefeatedMessage) { console.log("endBattle: bossDefeatedMessage にテキストを設定します"); bossDefeatedMessage.textContent = `🎉 ボス ${currentEnemy.name} 撃破！ 🎉`; } else { console.error("endBattle: bossDefeatedMessage が見つかりません！"); }
+            if (bossDefeatedOverlay) { console.log("endBattle: スタイルを直接変更して表示します"); bossDefeatedOverlay.style.display = 'flex'; bossDefeatedOverlay.style.opacity = '1'; if (bossDefeatedMessage) { bossDefeatedMessage.style.opacity = '1'; bossDefeatedMessage.style.transform = 'scale(1)'; } } else { console.error("endBattle: bossDefeatedOverlay が見つかりません！"); }
 
-            // ▼▼▼ オーバーレイ表示処理 (直接スタイルを変更) ▼▼▼
-            if (bossDefeatedOverlay) {
-                console.log("endBattle: スタイルを直接変更して表示します");
-                bossDefeatedOverlay.style.display = 'flex';     // display を flex に
-                bossDefeatedOverlay.style.opacity = '1';       // opacity を 1 に (これで見えるはず)
-                if (bossDefeatedMessage) {
-                     // メッセージ部分のアニメーションも直接適用 (オプション)
-                    bossDefeatedMessage.style.opacity = '1';
-                    bossDefeatedMessage.style.transform = 'scale(1)';
-                }
-            } else {
-                console.error("endBattle: bossDefeatedOverlay が見つかりません！");
-            }
-            // ▲▲▲ ここまで ▲▲▲
-
-            // 3秒後に演出を消すタイマーを設定
             console.log("endBattle: 3秒後にオーバーレイを非表示にするタイマーを設定します");
             setTimeout(() => {
                 console.log("endBattle: (3秒経過) オーバーレイ非表示処理を開始します");
-                // ▼▼▼ オーバーレイ非表示処理 (直接スタイルを変更) ▼▼▼
-                if (bossDefeatedOverlay) {
-                    bossDefeatedOverlay.style.opacity = '0'; // まず透明にする (アニメーション用)
-                     if (bossDefeatedMessage) {
-                        // メッセージ部分も元に戻す (オプション)
-                        bossDefeatedMessage.style.opacity = '0';
-                        bossDefeatedMessage.style.transform = 'scale(0.5)';
-                     }
-                    // アニメーションが終わるのを待ってから display:none にする
-                    setTimeout(() => {
-                        console.log("endBattle: (さらに0.5秒経過) オーバーレイの display を none にします");
-                        bossDefeatedOverlay.style.display = 'none';
-                    }, 500); // CSSのtransitionの時間に合わせる (opacity用)
-                }
-                 // ▲▲▲ ここまで ▲▲▲
+                if (bossDefeatedOverlay) { bossDefeatedOverlay.style.opacity = '0'; if (bossDefeatedMessage) { bossDefeatedMessage.style.opacity = '0'; bossDefeatedMessage.style.transform = 'scale(0.5)'; } setTimeout(() => { console.log("endBattle: (さらに0.5秒経過) オーバーレイの display を none にします"); bossDefeatedOverlay.style.display = 'none'; }, 500); }
             }, 3000);
 
             resultMessage = `すごい！ボス ${currentEnemy.name} をたおした！🏆`;
@@ -611,72 +674,24 @@ function endBattle() {
         saveHighestStage(gameMode, currentStage);
         currentStage++;
 
-        if (currentStage > maxStage) {
-             console.log("endBattle: 全ステージクリアしました");
-            resultMessage += " 🏆全ステージクリア！おめでとう！🏆";
-            if (startBtn) {
-                 startBtn.style.display = "none";
-            } else {
-                console.error("endBattle: startBtn (クリア時非表示用) が見つかりません！");
-            }
-        } else {
-             console.log("endBattle: 次のステージに進みます");
-            nextButtonText = `次の敵 (Lv${currentStage}) と戦う！`;
-             if (startBtn) {
-                startBtn.style.display = "inline-block";
-             } else {
-                 console.error("endBattle: startBtn (次へ表示用) が見つかりません！");
-             }
-        }
+        if (currentStage > maxStage) { console.log("endBattle: 全ステージクリアしました"); resultMessage += " 🏆全ステージクリア！おめでとう！🏆"; if (startBtn) { startBtn.style.display = "none"; } else { console.error("endBattle: startBtn (クリア時非表示用) が見つかりません！"); } } else { console.log("endBattle: 次のステージに進みます"); nextButtonText = `次の敵 (Lv${currentStage}) と戦う！`; if (startBtn) { startBtn.style.display = "inline-block"; } else { console.error("endBattle: startBtn (次へ表示用) が見つかりません！"); } }
 
     } else { // 敗北または時間切れの場合
         console.log("endBattle: 敗北または時間切れと判定されました");
-        isVictory = false;
-        resultMessage = playerHP <= 0 ? "😭敗北...また挑戦してね！" : "時間切れ...もう一度挑戦！";
-        nextButtonText = "再挑戦！";
-        if (startBtn) {
-            startBtn.style.display = "inline-block";
-        } else {
-            console.error("endBattle: startBtn (再挑戦表示用) が見つかりません！");
-        }
+        isVictory = false; resultMessage = playerHP <= 0 ? "😭敗北...また挑戦してね！" : "時間切れ...もう一度挑戦！"; nextButtonText = "再挑戦！"; if (startBtn) { startBtn.style.display = "inline-block"; } else { console.error("endBattle: startBtn (再挑戦表示用) が見つかりません！"); }
     }
 
-    // バトルログに結果を表示
-    if (battleLog) {
-        console.log("endBattle: バトルログに結果を表示します:", resultMessage);
-        battleLog.textContent = resultMessage;
-    } else {
-        console.error("endBattle: battleLog が見つかりません！");
-    }
+    if (battleLog) { console.log("endBattle: バトルログに結果を表示します:", resultMessage); battleLog.textContent = resultMessage; } else { console.error("endBattle: battleLog が見つかりません！"); }
+    if (nextButtonText) { if (startBtn) { console.log("endBattle: ボタンテキストを設定します:", nextButtonText); startBtn.textContent = nextButtonText; } else { console.error("endBattle: startBtn (テキスト設定用) が見つかりません！"); } }
 
-    // ボタンのテキストを設定
-    if (nextButtonText) {
-        if (startBtn) {
-             console.log("endBattle: ボタンテキストを設定します:", nextButtonText);
-            startBtn.textContent = nextButtonText;
-        } else {
-            console.error("endBattle: startBtn (テキスト設定用) が見つかりません！");
-        }
-    }
-
-    // 背景色のフラッシュ演出
     console.log("endBattle: 背景フラッシュ演出を開始します");
     document.body.classList.add(isVictory ? 'feedback-correct' : 'feedback-wrong');
-    setTimeout(() => {
-        document.body.classList.remove('feedback-correct', 'feedback-wrong');
-    }, 1000);
+    setTimeout(() => { document.body.classList.remove('feedback-correct', 'feedback-wrong'); }, 1000);
 
-    // ボス戦背景だった場合は解除
-    if (document.body.classList.contains('boss-battle-bg')) {
-        console.log("endBattle: ボス戦背景を解除します");
-        setTimeout(() => {
-            document.body.classList.remove('boss-battle-bg');
-        }, 500);
-    }
+    if (document.body.classList.contains('boss-battle-bg')) { console.log("endBattle: ボス戦背景を解除します"); setTimeout(() => { document.body.classList.remove('boss-battle-bg'); }, 500); }
     console.log("endBattle: 関数終了");
 }
-// --- endBattle関数 --- (ここまでコピー) 
-      // --- トレーニングモード関連関数 ---
+// --- endBattle関数 --- (ここまでコピー)      // --- トレーニングモード関連関数 ---
     function generateTrainingProblem(type) { let num1, num2, answer, questionText, op; switch (type) { case 'addsub1': if (Math.random() < 0.6) { op = '+'; do { num1 = Math.floor(Math.random() * 10); num2 = Math.floor(Math.random() * (10 - num1)); } while (num1 === 0 && num2 === 0); answer = num1 + num2; } else { op = '-'; num1 = Math.floor(Math.random() * 6) + 5; num2 = Math.floor(Math.random() * num1) + 1; answer = num1 - num2; } break; case 'addsub2': if (Math.random() < 0.5) { op = '+'; num1 = Math.floor(Math.random()*80)+10; num2 = Math.floor(Math.random()*80)+10; answer = num1 + num2; } else { op = '-'; num1 = Math.floor(Math.random()*80)+20; num2 = Math.floor(Math.random()*(num1-10))+10; answer = num1 - num2; } break; case 'mul': op = '×'; num1 = Math.floor(Math.random() * 8) + 2; num2 = Math.floor(Math.random() * 8) + 2; answer = num1 * num2; break; case 'div': op = '÷'; num2 = Math.floor(Math.random() * 8) + 2; answer = Math.floor(Math.random() * 8) + 2; num1 = num2 * answer; break; default: op = '+'; do { num1 = Math.floor(Math.random() * 10); num2 = Math.floor(Math.random() * (10 - num1)); } while (num1 === 0 && num2 === 0); answer = num1 + num2; } questionText = `${num1} ${op} ${num2}`; return { q: questionText, a: answer }; }
     function showTrainingQuestion() { if (trainingTimeRemaining <= 0) return; currentTrainingProblem = generateTrainingProblem(trainingType); trainingQuestion.textContent = currentTrainingProblem.q; const choices = generateChoices(currentTrainingProblem.a); trainingAnswerChoices.innerHTML = ""; trainingEnemyDisplay.classList.remove('defeated'); choices.forEach(choice => { const btn = document.createElement("button"); btn.textContent = choice; btn.className = "choice-btn"; btn.onclick = () => handleTrainingAnswer(choice); trainingAnswerChoices.appendChild(btn); }); battleInProgress = false; }
     function handleTrainingAnswer(selectedAnswer) { if (battleInProgress || trainingTimeRemaining <= 0) return; battleInProgress = true; const choiceButtons = trainingAnswerChoices.querySelectorAll('.choice-btn'); choiceButtons.forEach(btn => btn.disabled = true); playSound('tap'); if (selectedAnswer === currentTrainingProblem.a) { playSound('hit_perfect'); showFeedback("Correct!", "perfect"); trainingScore++; trainingScoreDisplay.textContent = `たおした数: ${trainingScore}`; trainingEnemyDisplay.classList.add('defeated'); playSound('enemyDefeated'); } else { playSound('wrong'); showFeedback("Wrong!", "wrong"); trainingTimeRemaining = Math.max(0, trainingTimeRemaining - 1); trainingTimer.textContent = `のこり時間: ${trainingTimeRemaining}秒`; } setTimeout(showTrainingQuestion, 200); }
