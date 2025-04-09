@@ -284,7 +284,6 @@
     const BGM_KEY = 'nekobattle_bgmEnabled_v1'; let questionsForThisStage = 15;
     const HIGHEST_STAGE_KEY_PREFIX = 'nekobattle_highestStage_'; let highestClearedStage = 0;
     let trainingType = ''; let trainingTimeLimit = 60; let trainingTimeRemaining = trainingTimeLimit; let trainingScore = 0; let trainingTimerInterval = null; const BEST_SCORE_KEY_PREFIX = 'nekobattle_bestScore_'; let currentTrainingProblem = null;
-let currentTrainingProblem = null;
 let comboDisplayTimeoutId = null; // ★追加: コンボ表示を消すタイマーID用
     // --- DOM要素取得 ---
     const modeSelectScreen = document.getElementById("modeSelectScreen"); const grade1ModeBtn = document.getElementById("grade1ModeBtn"); const grade2ModeBtn = document.getElementById("grade2ModeBtn"); const grade3ModeBtn = document.getElementById("grade3ModeBtn"); const grade4ModeBtn = document.getElementById("grade4ModeBtn"); const grade5ModeBtn = document.getElementById("grade5ModeBtn"); const trainingModeBtn = document.getElementById("trainingModeBtn"); const startMethodScreen = document.getElementById("startMethodScreen"); const startFromBeginningBtn = document.getElementById("startFromBeginningBtn"); const continueFromLastBtn = document.getElementById("continueFromLastBtn"); const battleScreen = document.getElementById("battleScreen"); const startBtn = document.getElementById("startBtn"); const questionDiv = document.getElementById("question"); const answerChoicesDiv = document.getElementById("answerChoices"); const battleLog = document.getElementById("battleLog"); const enemyArea = document.getElementById("enemyArea"); const enemyName = document.getElementById("enemyName"); const enemyHPText = document.getElementById("enemyHPText"); const enemyHPBar = document.getElementById("enemyHPBar"); const enemyCharacter = document.getElementById("enemyCharacter"); const playerArea = document.getElementById("playerArea"); const playerHPText = document.getElementById("playerHPText"); const playerHPBar = document.getElementById("playerHPBar"); const playerCharacter = document.getElementById("playerCharacter"); const feedbackDisplay = document.getElementById("feedbackDisplay"); const comboDisplay = document.getElementById("comboDisplay"); const bgmToggleBtn = document.getElementById("bgmToggleBtn");
@@ -535,92 +534,6 @@ function handleAnswer(selectedAnswer) {
 }
 // --- handleAnswer関数 --- (ここまでコピー)
 
-            // コンボボーナス計算
-            let comboBonus = 0;
-            if (comboCount >= 5) comboBonus = 2;
-            else if (comboCount >= 3) comboBonus = 1;
-            damageToEnemy = baseDamage + comboBonus;
-
-            // 敵へのダメージ処理と効果音・エフェクト
-            if (damageToEnemy > 0) {
-                logMessage += `敵に${damageToEnemy}ダメージ!`;
-                if (comboCount >= 3) logMessage += ` (${comboCount} Combo!)`;
-                feedbackClass = 'feedback-flash';
-                shakeCharacter('enemyCharacter');
-
-                // ▼▼▼ 評価別効果音 再生 ▼▼▼
-                if (isCritical) {
-                    playSound('hitCritical'); // critical_hit.mp3 を再生
-                } else if (feedbackType === "perfect") {
-                    playSound('hitPerfect'); // hit_perfect.mp3 を再生
-                } else if (feedbackType === "great") {
-                    playSound('hitGreat');   // hit_normal.mp3 を再生
-                } else if (feedbackType === "good") {
-                    playSound('hitGood');    // hit_normal.mp3 を再生
-                }
-                // ▲▲▲ 評価別効果音 再生 ▲▲▲
-
-                showDamageEffect(damageToEnemy, isCritical); // ダメージエフェクト表示
-
-                // ▼▼▼ コンボ効果音 再生 ▼▼▼
-                // 5, 10, 15コンボなど、区切りの良いコンボ数で音を鳴らす
-                if (comboCount === 5 || comboCount === 10 || comboCount === 15) { // 必要なら数字を追加・変更
-                    playSound('comboMilestone'); // combo_milestone.mp3 を再生
-                }
-                // ▲▲▲ コンボ効果音 再生 ▲▲▲
-
-            } else if (damageToPlayer > 0) { // 時間がかかりすぎて自分にダメージの場合
-                feedbackClass = 'feedback-damage-player';
-                shakeCharacter('playerCharacter');
-                playSound('hitPlayer'); // 自分にダメージ音
-            } else { // ダメージが発生しない正解の場合 (Good評価でダメージ0など)
-                feedbackClass = 'feedback-correct';
-                 // 必要であればここで音を鳴らす (例: playSound('hitGood');)
-                 // 今のロジックだとここに来るのは slowPenalty=0 の Grade1 で Good 未満だけどダメージ0 の時くらい？
-            }
-        } else { // 不正解の場合
-            playSound('wrong'); // 不正解音
-            damageToPlayer = wrongPenalty;
-            logMessage = `Wrong! 自分に${damageToPlayer}ダメージ!`;
-            feedbackText = "Wrong!";
-            feedbackType = "wrong";
-            feedbackClass = 'feedback-wrong';
-            comboCount = 0; // コンボリセット
-            shakeCharacter('playerCharacter');
-            playSound('hitPlayer'); // 自分にダメージ音
-        }
-
-        // コンボ表示更新
-        updateComboDisplay();
-
-        // HP更新と表示
-        enemyHP -= damageToEnemy;
-        playerHP -= damageToPlayer;
-        enemyHPText.textContent = Math.max(0, enemyHP);
-        playerHPText.textContent = Math.max(0, playerHP);
-        updateHPBar('enemyHPBar', enemyHP, enemyMaxHP);
-        updateHPBar('playerHPBar', playerHP, playerMaxHP);
-
-        // ログとフィードバック表示
-        battleLog.textContent = logMessage;
-        if(feedbackText) showFeedback(feedbackText, feedbackType);
-        if (feedbackClass) {
-            document.body.classList.add(feedbackClass);
-            setTimeout(() => {
-                document.body.classList.remove(feedbackClass);
-            }, 150);
-        }
-
-        // 次の問題へ or バトル終了判定
-        currentProblemIndex++;
-        setTimeout(() => {
-            if (playerHP <= 0 || enemyHP <= 0 || currentProblemIndex >= questionsForThisStage) {
-                endBattle();
-            } else {
-                showQuestion();
-            }
-        }, 1000); // 次の問題表示までの待ち時間
-    }
 
           // --- startBattle関数 ---
     function startBattle() { currentEnemy = enemies[currentStage] || enemies[maxStage]; if (!currentEnemy) { console.error("Error: Cannot find enemy data for stage", currentStage); return; } enemyMaxHP = currentEnemy.hp; if (currentEnemy.type === 'boss') { enemyMaxHP = Math.floor(enemyMaxHP * 1.5); } let hpMultiplier = 1.0; switch (gameMode) { case 'grade1': hpMultiplier = 0.5; break; case 'grade2': hpMultiplier = 0.7; break; case 'grade3': hpMultiplier = 0.9; break; case 'grade4': hpMultiplier = 0.95; break; case 'grade5': hpMultiplier = 1.0; break; } enemyMaxHP = Math.max(5, Math.floor(enemyMaxHP * hpMultiplier)); enemyHP = enemyMaxHP; playerHP = playerMaxHP; currentProblemIndex = 0; comboCount = 0; updateComboDisplay(); questionsForThisStage = (currentEnemy.type === 'boss') ? 20 : 15; problems = generateProblems(currentStage, gameMode, questionsForThisStage); if (!problems || problems.length === 0) { console.error("Error: generateProblems returned empty!", {currentStage, gameMode, questionsForThisStage}); battleLog.textContent = "エラー：問題生成失敗"; return; } enemyName.textContent = `${currentEnemy.emoji} ${currentEnemy.name} (Lv${currentStage})`; enemyHPText.textContent = enemyHP; playerHPText.textContent = playerHP; updateHPBar('enemyHPBar', enemyHP, enemyMaxHP); updateHPBar('playerHPBar', playerHP, playerMaxHP); enemyCharacter.textContent = currentEnemy.emoji; enemyCharacter.classList.remove('defeated'); stopBgm(); if (currentEnemy.type === 'boss') { document.body.classList.add('boss-battle-bg'); battleLog.textContent = `🔥ボス出現！ ${currentEnemy.name} があらわれた！🔥`; playBgm('bgmBoss'); } else { document.body.classList.remove('boss-battle-bg'); battleLog.textContent = `Lv${currentStage} ${currentEnemy.name} があらわれた！`; playBgm('bgmNormal'); } startBtn.style.display = "none"; battleInProgress = false; setTimeout(showQuestion, 1500); }
