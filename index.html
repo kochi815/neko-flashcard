@@ -332,26 +332,283 @@ const sounds = {
     function saveBestScore(type, score) { const key = getBestScoreKey(type); const currentBest = loadBestScore(type); if (score > currentBest) { localStorage.setItem(key, score.toString()); return true; } return false; }
     function loadBestScore(type) { const key = getBestScoreKey(type); const savedScore = localStorage.getItem(key); return savedScore ? parseInt(savedScore, 10) : 0; }
 
-    // --- 問題生成関数 (5モード, Lv40対応) ---
+// --- 問題生成関数 (★新しい調整案に基づき修正★) ---
     function generateProblems(stage, mode, count) {
         const generatedProblems = [];
         let num1, num2, num3, answer, questionText, type, correctAnswerValue;
-        for (let i = 0; i < count; i++) {
-            correctAnswerValue = null; questionText = ''; type = '';
-            let problemTypeRand = Math.random();
-            try {
-                 if (mode === 'grade1') { if (stage <= 10) { type = '+'; do { num1 = Math.floor(Math.random() * 10); num2 = Math.floor(Math.random() * (10 - num1)); } while (num1 === 0 && num2 === 0); correctAnswerValue = num1 + num2; questionText = `${num1} + ${num2}`; } else if (stage <= 20) { type = '-'; num1 = Math.floor(Math.random() * 6) + 5; num2 = Math.floor(Math.random() * num1) + 1; correctAnswerValue = num1 - num2; questionText = `${num1} - ${num2}`; } else if (stage <= 30) { type = '+'; num1 = Math.floor(Math.random() * 9) + 1; num2 = Math.floor(Math.random() * 9) + 1; correctAnswerValue = num1 + num2; questionText = `${num1} + ${num2}`; } else { type = '+'; num2 = Math.floor(Math.random() * 8) + 1; correctAnswerValue = Math.floor(Math.random() * 8) + 1; num1 = correctAnswerValue + num2; if(num1 > 15) {num1=15; correctAnswerValue = num1-num2; if(correctAnswerValue<0) correctAnswerValue=0;}; questionText = `? + ${num2} = ${num1}`; } }
-                 else if (mode === 'grade2') { if (stage <= 10) { if(problemTypeRand < 0.5) { type = '+'; num1 = Math.floor(Math.random() * 9) + 1; num2 = Math.floor(Math.random() * 9) + 1; correctAnswerValue = num1 + num2; questionText = `${num1} + ${num2}`; } else { type = '-'; num1 = Math.floor(Math.random() * 10) + 10; num2 = Math.floor(Math.random() * 9) + 1; correctAnswerValue = num1 - num2; questionText = `${num1} - ${num2}`; } } else if (stage <= 20) { type = '×'; num1 = Math.floor(Math.random() * 4) + 2; num2 = Math.floor(Math.random() * 8) + 2; correctAnswerValue = num1 * num2; questionText = `${num1} × ${num2}`; } else if (stage <= 30) { type = '×'; num1 = Math.floor(Math.random() * 8) + 2; num2 = Math.floor(Math.random() * 8) + 2; correctAnswerValue = num1 * num2; questionText = `${num1} × ${num2}`; } else { if (Math.random() < 0.5) { type = '+'; num1 = Math.floor(Math.random() * 9) + 1; correctAnswerValue = Math.floor(Math.random() * 9) + 1; num2 = num1 + correctAnswerValue; questionText = `${num1} + ? = ${num2}`; } else { type = '-'; num1 = Math.floor(Math.random() * 10) + 10; correctAnswerValue = Math.floor(Math.random() * 8) + 1; num2 = num1 - correctAnswerValue; questionText = `${num1} - ? = ${num2}`; } } }
-                 else if (mode === 'grade3') { if (stage <= 10) { if(problemTypeRand < 0.6) { type = '×'; num1 = Math.floor(Math.random() * 8) + 2; num2 = Math.floor(Math.random() * 8) + 2; correctAnswerValue = num1 * num2; questionText = `${num1} × ${num2}`; } else { type = '÷'; num2 = Math.floor(Math.random() * 8) + 2; correctAnswerValue = Math.floor(Math.random() * 8) + 2; num1 = num2 * correctAnswerValue; questionText = `${num1} ÷ ${num2}`; } } else if (stage <= 20) { if(problemTypeRand < 0.6) { type = '×'; num1 = Math.floor(Math.random()*6)+10; num2 = Math.floor(Math.random()*8)+2; correctAnswerValue = num1 * num2; questionText = `${num1} × ${num2}`; } else { type = '÷'; num2 = Math.floor(Math.random() * 8) + 2; correctAnswerValue = Math.floor(Math.random() * 8) + 2; num1 = num2 * correctAnswerValue; questionText = `${num1} ÷ ${num2}`; } } else if (stage <= 30) { if(problemTypeRand < 0.5) { type = '+'; num1 = Math.floor(Math.random()*80)+10; num2 = Math.floor(Math.random()*80)+10; correctAnswerValue = num1 + num2; questionText = `${num1} + ${num2}`; } else { type = '-'; num1 = Math.floor(Math.random()*80)+10; num2 = Math.floor(Math.random()*num1)+10; correctAnswerValue = num1 - num2; questionText = `${num1} - ${num2}`; } } else { if (Math.random() < 0.5) { type = '×'; num2 = Math.floor(Math.random() * 8) + 2; correctAnswerValue = Math.floor(Math.random() * 8) + 2; num1 = num2 * correctAnswerValue; if (Math.random() < 0.5) { questionText = `? × ${num2} = ${num1}`; } else { questionText = `${correctAnswerValue} × ? = ${num1}`; correctAnswerValue = num2; } } else { type = '÷'; num2 = Math.floor(Math.random() * 8) + 2; num3 = Math.floor(Math.random() * 8) + 2; num1 = num2 * num3; if (Math.random() < 0.5) { questionText = `${num1} ÷ ? = ${num3}`; correctAnswerValue = num2; } else { questionText = `? ÷ ${num2} = ${num3}`; correctAnswerValue = num1; } } } }
-                 else if (mode === 'grade4') { if (stage <= 5) { if(problemTypeRand < 0.5) { type = '×'; num1 = Math.floor(Math.random() * 8) + 2; num2 = Math.floor(Math.random() * 8) + 2; correctAnswerValue = num1 * num2; questionText = `${num1} × ${num2}`; } else { type = '÷'; num2 = Math.floor(Math.random() * 8) + 2; correctAnswerValue = Math.floor(Math.random() * 8) + 2; num1 = num2 * correctAnswerValue; questionText = `${num1} ÷ ${num2}`; } } else if (stage <= 15) { if(problemTypeRand < 0.5) { if (Math.random() < 0.5) { type = '+'; num1 = Math.floor(Math.random() * 80) + 10; num2 = Math.floor(Math.random() * 80) + 10; correctAnswerValue = num1 + num2; questionText = `${num1} + ${num2}`; } else { type = '-'; num1 = Math.floor(Math.random() * 80) + 20; num2 = Math.floor(Math.random() * (num1-10)) + 10; correctAnswerValue = num1 - num2; questionText = `${num1} - ${num2}`; } } else if (problemTypeRand < 0.8) { type = '×'; num1 = Math.floor(Math.random() * 8) + 2; num2 = Math.floor(Math.random() * 8) + 2; correctAnswerValue = num1 * num2; questionText = `${num1} × ${num2}`; } else { type = '÷'; num2 = Math.floor(Math.random() * 8) + 2; correctAnswerValue = Math.floor(Math.random() * 8) + 2; num1 = num2 * correctAnswerValue; questionText = `${num1} ÷ ${num2}`; } } else if (stage <= 30) { if(problemTypeRand < 0.6) { type = '÷'; num2 = Math.floor(Math.random() * 8) + 2; correctAnswerValue = Math.floor(Math.random() * 20) + 5; num1 = num2 * correctAnswerValue; questionText = `${num1} ÷ ${num2}`; } else { type = '×'; num1 = Math.floor(Math.random()*10)+10; num2 = Math.floor(Math.random()*8)+2; correctAnswerValue = num1 * num2; questionText = `${num1} × ${num2}`; } } else { if (Math.random() < 0.5) { type = '×'; num2 = Math.floor(Math.random() * 8) + 2; correctAnswerValue = Math.floor(Math.random() * 8) + 2; num1 = num2 * correctAnswerValue; if (Math.random() < 0.5) { questionText = `? × ${num2} = ${num1}`; } else { questionText = `${correctAnswerValue} × ? = ${num1}`; correctAnswerValue = num2; } } else { type = '÷'; num2 = Math.floor(Math.random() * 8) + 2; num3 = Math.floor(Math.random() * 8) + 2; num1 = num2 * num3; if (Math.random() < 0.5) { questionText = `${num1} ÷ ? = ${num3}`; correctAnswerValue = num2; } else { questionText = `? ÷ ${num2} = ${num3}`; correctAnswerValue = num1; } } } }
-                 else { /* mode === 'grade5' */ if (stage <= 10) { if(problemTypeRand < 0.5) { if (Math.random() < 0.5) { type = '+'; num1 = Math.floor(Math.random() * 80) + 10; num2 = Math.floor(Math.random() * 80) + 10; correctAnswerValue = num1 + num2; questionText = `${num1} + ${num2}`; } else { type = '-'; num1 = Math.floor(Math.random() * 80) + 20; num2 = Math.floor(Math.random() * (num1-10)) + 10; correctAnswerValue = num1 - num2; questionText = `${num1} - ${num2}`; } } else if (problemTypeRand < 0.8) { type = '×'; num1 = Math.floor(Math.random() * 8) + 2; num2 = Math.floor(Math.random() * 8) + 2; correctAnswerValue = num1 * num2; questionText = `${num1} × ${num2}`; } else { type = '÷'; num2 = Math.floor(Math.random() * 8) + 2; correctAnswerValue = Math.floor(Math.random() * 8) + 2; num1 = num2 * correctAnswerValue; questionText = `${num1} ÷ ${num2}`; } } else if (stage <= 20) { if(problemTypeRand < 0.5) { type = '×'; num1 = Math.floor(Math.random()*11)+10; num2 = Math.floor(Math.random()*8)+2; correctAnswerValue = num1 * num2; questionText = `${num1} × ${num2}`; } else { type = '÷'; num2 = Math.floor(Math.random() * 8) + 2; correctAnswerValue = Math.floor(Math.random() * 30) + 10; num1 = num2 * correctAnswerValue; questionText = `${num1} ÷ ${num2}`; } } else if (stage <= 30) { if(problemTypeRand < 0.5) { type = '×'; num1 = Math.floor(Math.random()*21)+10; num2 = Math.floor(Math.random()*9)+11; correctAnswerValue = num1 * num2; questionText = `${num1} × ${num2}`; } else if (problemTypeRand < 0.8) { type = '+'; num1 = Math.floor(Math.random()*800)+100; num2 = Math.floor(Math.random()*800)+100; correctAnswerValue = num1 + num2; questionText = `${num1} + ${num2}`; } else { type = '-'; num1 = Math.floor(Math.random()*800)+100; num2 = Math.floor(Math.random()*num1)+1; correctAnswerValue = num1 - num2; questionText = `${num1} - ${num2}`; } } else { const rand = Math.random(); if (rand < 0.6) { if (Math.random() < 0.5) { type = '×'; num2 = Math.floor(Math.random() * 8) + 2; correctAnswerValue = Math.floor(Math.random() * 12) + 2; num1 = num2 * correctAnswerValue; if (Math.random() < 0.5) { questionText = `? × ${num2} = ${num1}`; } else { questionText = `${correctAnswerValue} × ? = ${num1}`; correctAnswerValue = num2; } } else { type = '÷'; num2 = Math.floor(Math.random() * 8) + 2; num3 = Math.floor(Math.random() * 12) + 2; num1 = num2 * num3; if (Math.random() < 0.5) { questionText = `${num1} ÷ ? = ${num3}`; correctAnswerValue = num2; } else { questionText = `? ÷ ${num2} = ${num3}`; correctAnswerValue = num1; } } } else { type = '×'; num1 = Math.floor(Math.random()*40)+11; num2 = Math.floor(Math.random()*40)+11; correctAnswerValue = num1 * num2; questionText = `${num1} × ${num2}`; } } }
-                 if (questionText && correctAnswerValue !== null) { generatedProblems.push({ q: questionText, a: correctAnswerValue }); } else { console.error("ERROR: Failed!", {stage, mode, i, type, num1, num2, num3, questionText, correctAnswerValue}); generatedProblems.push({ q: "1 + 1", a: 2 }); }
-            } catch (error) { console.error("ERROR during gen:", {stage, mode, i, error}); generatedProblems.push({ q: "2 + 2", a: 4 }); }
-        }
-        for (let i = generatedProblems.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [generatedProblems[i], generatedProblems[j]] = [generatedProblems[j], generatedProblems[i]]; }
-        return generatedProblems;
-    }
 
+        // --- ヘルパー関数群 ---
+        // 答えが99以下の2桁足し算を生成 (主に3年生以降で使用)
+        function generateAdditionUpTo99() {
+            correctAnswerValue = Math.floor(Math.random() * 90) + 10; // 答えを10-99で決定
+            num1 = Math.floor(Math.random() * (correctAnswerValue - 1)) + 1; // num1を 1 ~ (答え-1) で決定
+             // 必要なら num1, num2 が両方10以上になるよう調整も可能だが、今回はシンプルに
+            num2 = correctAnswerValue - num1;
+            questionText = `${num1} + ${num2}`;
+            type = '+';
+            return { q: questionText, a: correctAnswerValue, type: type };
+        }
+
+        // 答えがマイナスにならない2桁引き算を生成 (主に3年生以降で使用)
+        function generateSubtractionNoNegative() {
+            num1 = Math.floor(Math.random() * 80) + 20; // 引かれる数 (20-99)
+            num2 = Math.floor(Math.random() * (num1 - 10)) + 10; // 引く数 (10 ~ num1-1)
+            correctAnswerValue = num1 - num2;
+            questionText = `${num1} - ${num2}`;
+            type = '-';
+            return { q: questionText, a: correctAnswerValue, type: type };
+        }
+
+        // 2桁×1桁の掛け算を生成 (主に4年生以降で使用)
+        function generateMul2DigitBy1Digit() {
+             num1 = Math.floor(Math.random() * 80) + 20; // 20-99 (2桁の数)
+             num2 = Math.floor(Math.random() * 8) + 2; // 2-9 (1桁の数)
+             correctAnswerValue = num1 * num2;
+             questionText = `${num1} × ${num2}`;
+             type = '×';
+            return { q: questionText, a: correctAnswerValue, type: type };
+        }
+
+        // 割り算（答えが2桁、あまりなし）を生成 (主に4年生以降で使用)
+        function generateDivAnswer2Digit() {
+             correctAnswerValue = Math.floor(Math.random() * 90) + 10; // 答えを10-99で決定
+             num2 = Math.floor(Math.random() * 8) + 2; // 割る数を 2-9 で決定
+             num1 = correctAnswerValue * num2; // 割られる数を計算
+             questionText = `${num1} ÷ ${num2}`;
+             type = '÷';
+            return { q: questionText, a: correctAnswerValue, type: type };
+        }
+
+        // --- 問題生成ループ ---
+        for (let i = 0; i < count; i++) {
+            correctAnswerValue = null;
+            questionText = ''; type = '';
+            let problemTypeRand = Math.random(); // 問題タイプの抽選用
+
+            try {
+                 // --- 🎒 １ねんせい モード ---
+                 if (mode === 'grade1') {
+                    if (stage <= 10) { // 序盤: 10までの足し算
+                        type = '+';
+                        do { num1 = Math.floor(Math.random() * 11); num2 = Math.floor(Math.random() * (11 - num1)); } while (num1 === 0 && num2 === 0); // 0+0 を避ける
+                        correctAnswerValue = num1 + num2; questionText = `${num1} + ${num2}`;
+                    } else if (stage <= 20) { // 中盤: 1桁の引き算 (答えは0以上)
+                        type = '-';
+                        num1 = Math.floor(Math.random() * 10) + 1; // 1-10
+                        num2 = Math.floor(Math.random() * num1); // 0 - (num1-1)
+                        correctAnswerValue = num1 - num2; questionText = `${num1} - ${num2}`;
+                    } else if (stage <= 30) { // 終盤: 繰り上がりのある1桁足し算
+                        type = '+';
+                        do {
+                            num1 = Math.floor(Math.random() * 9) + 1; // 1-9
+                            num2 = Math.floor(Math.random() * 9) + 1; // 1-9
+                        } while (num1 + num2 < 10); // 合計が10以上になるまで繰り返す
+                        correctAnswerValue = num1 + num2; questionText = `${num1} + ${num2}`;
+                    } else { // 最難関: 10までの足し算/引き算 虫食い算
+                        if (problemTypeRand < 0.5) { // 足し算の虫食い (? + a = b)
+                            type = '+';
+                            num2 = Math.floor(Math.random() * 9) + 1; // 1-9 (足す数)
+                            num1 = Math.floor(Math.random() * 10) + 1; // 1-10 (合計)
+                            // num1 > num2 になるように調整
+                            if (num1 <= num2) { num1 = num2 + Math.floor(Math.random() * (10 - num2)) + 1; if(num1 > 10) num1 = 10;}
+                            correctAnswerValue = num1 - num2; // ? に入る数
+                            questionText = `? + ${num2} = ${num1}`;
+                        } else { // 引き算の虫食い (a - ? = b)
+                            type = '-';
+                            num1 = Math.floor(Math.random() * 9) + 2; // 2-10 (引かれる数)
+                            correctAnswerValue = Math.floor(Math.random() * (num1 - 1)) + 1; // 1 ~ (num1-1) (?)
+                            num2 = num1 - correctAnswerValue; // 答え
+                            questionText = `${num1} - ? = ${num2}`;
+                        }
+                    }
+                }
+                 // --- 🎒 ２ねんせい モード ---
+                 else if (mode === 'grade2') {
+                     if (stage <= 10) { // 序盤: 繰り上がり足し算 or 2桁-1桁引き算
+                        if (problemTypeRand < 0.5) { // 繰り上がり足し算
+                             type = '+';
+                             do { num1 = Math.floor(Math.random() * 9) + 1; num2 = Math.floor(Math.random() * 9) + 1; } while (num1 + num2 < 10);
+                             correctAnswerValue = num1 + num2; questionText = `${num1} + ${num2}`;
+                        } else { // 2桁-1桁引き算
+                             type = '-';
+                             num1 = Math.floor(Math.random() * 10) + 10; // 10-19
+                             num2 = Math.floor(Math.random() * (num1 - 9)) + 1; // 1 ~ (num1-9) -> 答えが最低1桁になるように
+                              // 例: 15 - ?  ?は 1~6  答えは9~14
+                             correctAnswerValue = num1 - num2; questionText = `${num1} - ${num2}`;
+                        }
+                    } else if (stage <= 20) { // 中盤: 九九（基本、簡単な段中心）
+                         type = '×';
+                         num1 = Math.floor(Math.random() * 5) + 1; // 1-5
+                         num2 = Math.floor(Math.random() * 9) + 1; // 1-9
+                         // 交換してもOK
+                         if(Math.random() < 0.5) [num1, num2] = [num2, num1];
+                          // 1の段も含む
+                         correctAnswerValue = num1 * num2; questionText = `${num1} × ${num2}`;
+                    } else if (stage <= 30) { // 終盤: 九九（全範囲）
+                         type = '×';
+                         num1 = Math.floor(Math.random() * 9) + 1; // 1-9
+                         num2 = Math.floor(Math.random() * 9) + 1; // 1-9
+                         correctAnswerValue = num1 * num2; questionText = `${num1} × ${num2}`;
+                    } else { // 最難関: 繰り上がり/繰り下がり含む 足し算/引き算 虫食い算
+                        if (problemTypeRand < 0.5) { // 足し算虫食い (a + ? = b)
+                            type = '+';
+                            num1 = Math.floor(Math.random() * 9) + 1; // 1-9
+                            num2 = Math.floor(Math.random() * 9) + 10; // 10-18 (合計)
+                            correctAnswerValue = num2 - num1; // ? (1-9)
+                            questionText = `${num1} + ? = ${num2}`;
+                         } else { // 引き算虫食い (a - ? = b)
+                            type = '-';
+                            num1 = Math.floor(Math.random() * 10) + 10; // 10-19 (引かれる数)
+                            num2 = Math.floor(Math.random() * 9) + 1; // 1-9 (答え)
+                            correctAnswerValue = num1 - num2; // ? (1-9)
+                            questionText = `${num1} - ? = ${num2}`;
+                         }
+                    }
+                }
+                 // --- 📚 ３ねんせい モード ---
+                 else if (mode === 'grade3') {
+                     if (stage <= 10) { // 序盤: 割り算（あまりなし、九九逆算）
+                        type = '÷';
+                        num2 = Math.floor(Math.random() * 8) + 2; // 割る数 2-9
+                        correctAnswerValue = Math.floor(Math.random() * 8) + 2; // 答え 2-9
+                        num1 = num2 * correctAnswerValue; // 割られる数
+                        questionText = `${num1} ÷ ${num2}`;
+                    } else if (stage <= 20) { // 中盤: 2桁の足し算（計99以下）
+                        const problemData = generateAdditionUpTo99();
+                        questionText = problemData.q; correctAnswerValue = problemData.a; type = problemData.type;
+                    } else if (stage <= 30) { // 終盤: 2桁の引き算（マイナスなし）
+                        const problemData = generateSubtractionNoNegative();
+                        questionText = problemData.q; correctAnswerValue = problemData.a; type = problemData.type;
+                    } else { // 最難関: 九九範囲の 掛け算/割り算 虫食い算
+                         if (problemTypeRand < 0.5) { // 掛け算虫食い (? x a = b or a x ? = b)
+                            type = '×';
+                            num2 = Math.floor(Math.random() * 8) + 2; // 2-9
+                            correctAnswerValue = Math.floor(Math.random() * 8) + 2; // 2-9 (?)
+                            num1 = num2 * correctAnswerValue; // 結果
+                            if (Math.random() < 0.5) { questionText = `? × ${num2} = ${num1}`; } else { questionText = `${correctAnswerValue} × ? = ${num1}`; correctAnswerValue = num2; }
+                         } else { // 割り算虫食い (a / ? = b or ? / a = b)
+                            type = '÷';
+                            num2 = Math.floor(Math.random() * 8) + 2; // 割る数 or 答え (?)
+                            num3 = Math.floor(Math.random() * 8) + 2; // 答え or 割る数
+                            num1 = num2 * num3; // 割られる数
+                            if (Math.random() < 0.5) { questionText = `${num1} ÷ ? = ${num3}`; correctAnswerValue = num2; } else { questionText = `? ÷ ${num2} = ${num3}`; correctAnswerValue = num1; }
+                         }
+                    }
+                }
+                 // --- 📚 ４ねんせい モード ---
+                 else if (mode === 'grade4') {
+                     if (stage <= 10) { // 序盤: 2桁の足し算 / 2桁の引き算 (3年生の復習)
+                        if (problemTypeRand < 0.5) {
+                             const problemData = generateAdditionUpTo99();
+                             questionText = problemData.q; correctAnswerValue = problemData.a; type = problemData.type;
+                        } else {
+                             const problemData = generateSubtractionNoNegative();
+                             questionText = problemData.q; correctAnswerValue = problemData.a; type = problemData.type;
+                        }
+                    } else if (stage <= 20) { // 中盤: 2桁 × 1桁 の掛け算
+                         const problemData = generateMul2DigitBy1Digit();
+                         questionText = problemData.q; correctAnswerValue = problemData.a; type = problemData.type;
+                    } else if (stage <= 30) { // 終盤: 割り算（答えが2桁）
+                         const problemData = generateDivAnswer2Digit();
+                         questionText = problemData.q; correctAnswerValue = problemData.a; type = problemData.type;
+                    } else { // 最難関: 2桁レベル計算(+-×÷)の虫食い算
+                         const randType = Math.random();
+                         if (randType < 0.25) { // 足し算虫食い (a + ? = b)
+                            type = '+';
+                            let p = generateAdditionUpTo99(); // 2桁足し算を生成
+                             num1 = Math.min(p.a - 1, Math.max(10, Math.floor(Math.random()*p.a))); // 片方の数を決定
+                             correctAnswerValue = p.a - num1; // ?
+                             questionText = `${num1} + ? = ${p.a}`;
+                         } else if (randType < 0.5) { // 引き算虫食い (a - ? = b)
+                             type = '-';
+                             let p = generateSubtractionNoNegative(); // 2桁引き算を生成
+                             num1 = p.a + p.q.split(' - ')[1]*1; // 元の引かれる数
+                             correctAnswerValue = parseInt(p.q.split(' - ')[1]); // ? (引く数)
+                             questionText = `${num1} - ? = ${p.a}`;
+                         } else if (randType < 0.75) { // 掛け算虫食い (? x a = b)
+                             type = '×';
+                             let p = generateMul2DigitBy1Digit(); // 2桁x1桁を生成
+                             num2 = parseInt(p.q.split(' × ')[1]); // 1桁の数
+                             correctAnswerValue = parseInt(p.q.split(' × ')[0]); // ? (2桁の数)
+                              questionText = `? × ${num2} = ${p.a}`;
+                         } else { // 割り算虫食い (a / ? = b)
+                             type = '÷';
+                             let p = generateDivAnswer2Digit(); // 割り算(答え2桁)を生成
+                             num1 = p.a * parseInt(p.q.split(' ÷ ')[1]); // 元の割られる数
+                             correctAnswerValue = parseInt(p.q.split(' ÷ ')[1]); // ? (割る数)
+                             questionText = `${num1} ÷ ? = ${p.a}`;
+                         }
+                    }
+                }
+                 // --- 🎓 ５ねんせい モード ---
+                 else { // mode === 'grade5'
+                    if (stage <= 10) { // 序盤: 2桁×1桁 / 割り算(答え2桁) (4年生の復習)
+                         if (problemTypeRand < 0.5) {
+                             const problemData = generateMul2DigitBy1Digit();
+                             questionText = problemData.q; correctAnswerValue = problemData.a; type = problemData.type;
+                         } else {
+                              const problemData = generateDivAnswer2Digit();
+                              questionText = problemData.q; correctAnswerValue = problemData.a; type = problemData.type;
+                         }
+                    } else if (stage <= 20) { // 中盤: 2桁足し算/引き算 (少し複雑な数)
+                        if (problemTypeRand < 0.5) { // 足し算 (合計が100を超える場合もあり)
+                             type = '+';
+                             num1 = Math.floor(Math.random() * 90) + 10; // 10-99
+                             num2 = Math.floor(Math.random() * 90) + 10; // 10-99
+                             correctAnswerValue = num1 + num2; questionText = `${num1} + ${num2}`;
+                        } else { // 引き算 (繰り下がりが多いパターンなど)
+                             const problemData = generateSubtractionNoNegative();
+                             questionText = problemData.q; correctAnswerValue = problemData.a; type = problemData.type;
+                        }
+                    } else if (stage <= 30) { // 終盤: 4年生レベル計算の混合 (速度・正確性重視)
+                         const randType = Math.random();
+                         if (randType < 0.25) {
+                            const problemData = generateAdditionUpTo99();
+                            questionText = problemData.q; correctAnswerValue = problemData.a; type = problemData.type;
+                         } else if (randType < 0.5) {
+                            const problemData = generateSubtractionNoNegative();
+                            questionText = problemData.q; correctAnswerValue = problemData.a; type = problemData.type;
+                         } else if (randType < 0.75) {
+                             const problemData = generateMul2DigitBy1Digit();
+                             questionText = problemData.q; correctAnswerValue = problemData.a; type = problemData.type;
+                         } else {
+                              const problemData = generateDivAnswer2Digit();
+                              questionText = problemData.q; correctAnswerValue = problemData.a; type = problemData.type;
+                         }
+                    } else { // 最難関: 4年生レベル計算(+-×÷)の虫食い算 (4年生と同じ)
+                          const randType = Math.random();
+                         if (randType < 0.25) { type = '+'; let p = generateAdditionUpTo99(); num1 = Math.min(p.a - 1, Math.max(10, Math.floor(Math.random()*p.a))); correctAnswerValue = p.a - num1; questionText = `${num1} + ? = ${p.a}`;
+                         } else if (randType < 0.5) { type = '-'; let p = generateSubtractionNoNegative(); num1 = p.a + p.q.split(' - ')[1]*1; correctAnswerValue = parseInt(p.q.split(' - ')[1]); questionText = `${num1} - ? = ${p.a}`;
+                         } else if (randType < 0.75) { type = '×'; let p = generateMul2DigitBy1Digit(); num2 = parseInt(p.q.split(' × ')[1]); correctAnswerValue = parseInt(p.q.split(' × ')[0]); questionText = `? × ${num2} = ${p.a}`;
+                         } else { type = '÷'; let p = generateDivAnswer2Digit(); num1 = p.a * parseInt(p.q.split(' ÷ ')[1]); correctAnswerValue = parseInt(p.q.split(' ÷ ')[1]); questionText = `${num1} ÷ ? = ${p.a}`;
+                         }
+                    }
+                }
+
+                 // 問題生成成功チェック
+                 if (questionText && correctAnswerValue !== null && typeof correctAnswerValue === 'number' && !isNaN(correctAnswerValue)) {
+                    generatedProblems.push({ q: questionText, a: correctAnswerValue });
+                 } else {
+                     console.error("ERROR: Failed to generate valid problem!", {stage, mode, i, type, num1, num2, num3, questionText, correctAnswerValue});
+                     // フォールバック問題
+                     generatedProblems.push({ q: "1 + 1", a: 2 });
+                 }
+
+            } catch (error) {
+                 console.error("ERROR during problem generation:", {stage, mode, i, error});
+                 // エラー時のフォールバック問題
+                 generatedProblems.push({ q: "2 + 2", a: 4 });
+            }
+        } // for loop end
+
+        // 問題配列をシャッフル (Fisher-Yates shuffle)
+        for (let i = generatedProblems.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [generatedProblems[i], generatedProblems[j]] = [generatedProblems[j], generatedProblems[i]];
+        }
+
+        return generatedProblems;
+    } // generateProblems function end
     // --- 選択肢生成関数 ---
     function generateChoices(correct) { const choices = new Set(); if (typeof correct !== 'number' || isNaN(correct)) { console.error("Invalid 'correct' answer:", correct); correct = 0; } correct = Math.round(correct); choices.add(correct); const maxAttempts = 50; let attempts = 0; while (choices.size < 6 && attempts < maxAttempts) { let wrongAnswer; const magnitude = Math.max(1, Math.abs(correct)); const range = Math.min(10, Math.ceil(magnitude * 0.4) + 4); let delta = Math.floor(Math.random() * (range * 2 + 1)) - range; if (Math.random() < 0.15) { delta += (Math.random() < 0.5 ? 1 : -1) * (Math.floor(Math.random() * 10) + 5); } if (delta === 0) delta = Math.random() < 0.5 ? 1 : -1; wrongAnswer = correct + delta; wrongAnswer = Math.round(wrongAnswer); if (wrongAnswer >= 0 && !choices.has(wrongAnswer)) { choices.add(wrongAnswer); } attempts++; } let filler = 1; while (choices.size < 6) { let fillChoice1 = Math.max(0, correct + filler); let fillChoice2 = Math.max(0, correct - filler); if (!choices.has(fillChoice1)) choices.add(fillChoice1); if (choices.size < 6 && fillChoice2 >= 0 && !choices.has(fillChoice2)) choices.add(fillChoice2); filler++; if (filler > correct + 20) break; } const choiceArray = Array.from(choices); choiceArray.sort(() => Math.random() - 0.5); return choiceArray; }
     // --- HPバー更新関数 ---
