@@ -321,7 +321,56 @@ const sounds = {
     bgmToggleBtn.addEventListener('click', () => { isBgmEnabled = !isBgmEnabled; localStorage.setItem(BGM_KEY, JSON.stringify(isBgmEnabled)); updateBgmButton(); if (isBgmEnabled) { if (!currentBgm && (battleInProgress || gameMode === 'training')) { if(gameMode === 'training') playBgm('bgmTraining'); else if (currentEnemy && typeof currentEnemy.type !== 'undefined') playBgm(currentEnemy.type === 'boss' ? 'bgmBoss' : 'bgmNormal'); } } else { stopBgm(); } playSound('tap'); });
 
     // --- 敵データ Lv40まで ---
-    const enemies = { 1: { name: "ぷるぷるスライム", emoji: "💧", hp: 10, type: "normal" }, 2: { name: "スライム", emoji: "💧", hp: 12, type: "normal" }, 3: { name: "おおきなスライム", emoji: "💧", hp: 15, type: "normal" }, 4: { name: "ぶきみなコウモリ", emoji: "🦇", hp: 18, type: "normal" }, 5: { name: "ボス コウモリロード", emoji: "🦇👑", hp: 28, type: "boss" }, 6: { name: "さまようゴースト", emoji: "👻", hp: 22, type: "normal" }, 7: { name: "ゴーストチーフ", emoji: "👻", hp: 26, type: "normal" }, 8: { name: "ホネホネスケルトン", emoji: "💀", hp: 30, type: "normal" }, 9: { name: "スケルトンナイト", emoji: "💀", hp: 35, type: "normal" }, 10: { name: "ボス ゴブリンシャーマン", emoji: "👺✨", hp: 50, type: "boss" }, 11: { name: "くさったしたい", emoji: "🧟", hp: 40, type: "normal" }, 12: { name: "マッドハンド", emoji: "✋", hp: 44, type: "normal" }, 13: { name: "マッドハンドリーダー", emoji: "✋", hp: 49, type: "normal" }, 14: { name: "ガーゴイル", emoji: "🗿🦇", hp: 55, type: "normal" }, 15: { name: "ボス サイクロプス", emoji: "👁️", hp: 75, type: "boss" }, 16: { name: "オーク", emoji: "🐗", hp: 65, type: "normal" }, 17: { name: "オークリーダー", emoji: "🐗", hp: 72, type: "normal" }, 18: { name: "ミノタウロス", emoji: "🐂", hp: 80, type: "normal" }, 19: { name: "ミノタウロス（兄）", emoji: "🐂", hp: 88, type: "normal" }, 20: { name: "ボス リッチ", emoji: "💀👑", hp: 115, type: "boss" }, 21: { name: "アイスゴーレム", emoji: "🧊🗿", hp: 100, type: "normal" }, 22: { name: "フレイムゴーレム", emoji: "🔥🗿", hp: 100, type: "normal" }, 23: { name: "キメラ", emoji: "🦁🐐🐍", hp: 115, type: "normal" }, 24: { name: "キメラ（変異種）", emoji: "🦁🐐🐍", hp: 125, type: "normal" }, 25: { name: "ボス グリフォン", emoji: "🦅🦁", hp: 160, type: "boss" }, 26: { name: "レッサーデーモン", emoji: "👿", hp: 140, type: "normal" }, 27: { name: "アークデーモン", emoji: "🔥👿", hp: 155, type: "normal" }, 28: { name: "ダークナイト", emoji: "🛡️⚔️", hp: 170, type: "normal" }, 29: { name: "デスナイト", emoji: "💀⚔️", hp: 185, type: "normal" }, 30: { name: "ボス ドラゴンゾンビ", emoji: "💀🐉", hp: 230, type: "boss" }, 31: { name: "メタルスライム", emoji: "⚙️💧", hp: 50, type: "normal" }, 32: { name: "はぐれメタル", emoji: "✨💧", hp: 70, type: "normal" }, 33: { name: "魔界の騎士", emoji: "😈⚔️", hp: 250, type: "normal" }, 34: { name: "魔界の魔道士", emoji: "😈🧙", hp: 270, type: "normal" }, 35: { name: "ボス ヒドラ", emoji: "🐍🐍🐍", hp: 340, type: "boss" }, 36: { name: "魔王のしもべ・炎", emoji: "🔥しもべ", hp: 300, type: "normal" }, 37: { name: "魔王のしもべ・氷", emoji: "🧊しもべ", hp: 300, type: "normal" }, 38: { name: "魔王のしもべ・雷", emoji: "⚡しもべ", hp: 300, type: "normal" }, 39: { name: "魔王親衛隊長", emoji: "👑🛡️⚔️", hp: 360, type: "normal" }, 40: { name: "大魔王ニャンゾーマ", emoji: "😈👑🐈", hp: 480, type: "boss" } };
+    const enemies = {
+    // --- ステージ 1-10 (序盤問題) ---
+    1: { name: "ぷるぷるスライム", emoji: "💧", hp: 10, type: "normal" }, // 区分開始
+    2: { name: "スライム", emoji: "💧", hp: 10, type: "normal" },
+    3: { name: "おおきなスライム", emoji: "💧", hp: 11, type: "normal" },
+    4: { name: "ぶきみなコウモリ", emoji: "🦇", hp: 11, type: "normal" },
+    5: { name: "ボス コウモリロード", emoji: "🦇👑", hp: 15, type: "boss" },   // ボス1
+    6: { name: "さまようゴースト", emoji: "👻", hp: 12, type: "normal" },
+    7: { name: "ゴーストチーフ", emoji: "👻", hp: 13, type: "normal" },
+    8: { name: "ホネホネスケルトン", emoji: "💀", hp: 13, type: "normal" },
+    9: { name: "スケルトンナイト", emoji: "💀", hp: 14, type: "normal" }, // 区分終わり(高め)
+    10: { name: "ボス ゴブリンシャーマン", emoji: "👺✨", hp: 18, type: "boss" }, // ボス2
+
+    // --- ステージ 11-20 (中盤問題) ---
+    11: { name: "くさったしたい", emoji: "🧟", hp: 16, type: "normal" }, // 区分開始(Lv10より少し下げ)
+    12: { name: "マッドハンド", emoji: "✋", hp: 17, type: "normal" },
+    13: { name: "マッドハンドリーダー", emoji: "✋", hp: 18, type: "normal" },
+    14: { name: "ガーゴイル", emoji: "🗿🦇", hp: 19, type: "normal" },
+    15: { name: "ボス サイクロプス", emoji: "👁️", hp: 24, type: "boss" },   // ボス3
+    16: { name: "オーク", emoji: "🐗", hp: 21, type: "normal" },
+    17: { name: "オークリーダー", emoji: "🐗", hp: 22, type: "normal" },
+    18: { name: "ミノタウロス", emoji: "🐂", hp: 23, type: "normal" },
+    19: { name: "ミノタウロス（兄）", emoji: "🐂", hp: 25, type: "normal" }, // 区分終わり(高め)
+    20: { name: "ボス リッチ", emoji: "💀👑", hp: 30, type: "boss" },   // ボス4
+
+    // --- ステージ 21-30 (終盤問題) ---
+    21: { name: "アイスゴーレム", emoji: "🧊🗿", hp: 27, type: "normal" }, // 区分開始(Lv20より少し下げ)
+    22: { name: "フレイムゴーレム", emoji: "🔥🗿", hp: 28, type: "normal" },
+    23: { name: "キメラ", emoji: "🦁🐐🐍", hp: 30, type: "normal" },
+    24: { name: "キメラ（変異種）", emoji: "🦁🐐🐍", hp: 32, type: "normal" },
+    25: { name: "ボス グリフォン", emoji: "🦅🦁", hp: 38, type: "boss" },   // ボス5
+    26: { name: "レッサーデーモン", emoji: "👿", hp: 35, type: "normal" },
+    27: { name: "アークデーモン", emoji: "🔥👿", hp: 37, type: "normal" },
+    28: { name: "ダークナイト", emoji: "🛡️⚔️", hp: 40, type: "normal" },
+    29: { name: "デスナイト", emoji: "💀⚔️", hp: 43, type: "normal" }, // 区分終わり(高め)
+    30: { name: "ボス ドラゴンゾンビ", emoji: "💀🐉", hp: 50, type: "boss" }, // ボス6
+
+    // --- ステージ 31-40 (最難関問題/虫食い) ---
+    // ※メタル系のHPは意図的に低く設定しています。必要に応じて調整してください。
+    31: { name: "メタルスライム", emoji: "⚙️💧", hp: 20, type: "normal" }, // ★HP注意 (低め設定案)
+    32: { name: "はぐれメタル", emoji: "✨💧", hp: 25, type: "normal" }, // ★HP注意 (低め設定案)
+    33: { name: "魔界の騎士", emoji: "😈⚔️", hp: 55, type: "normal" }, // メタル後、本格的に難関へ
+    34: { name: "魔界の魔道士", emoji: "😈🧙", hp: 60, type: "normal" },
+    35: { name: "ボス ヒドラ", emoji: "🐍🐍🐍", hp: 75, type: "boss" },   // ボス7
+    36: { name: "魔王のしもべ・炎", emoji: "🔥しもべ", hp: 70, type: "normal" },
+    37: { name: "魔王のしもべ・氷", emoji: "🧊しもべ", hp: 75, type: "normal" },
+    38: { name: "魔王のしもべ・雷", emoji: "⚡しもべ", hp: 80, type: "normal" },
+    39: { name: "魔王親衛隊長", emoji: "👑🛡️⚔️", hp: 90, type: "normal" }, // 区分終わり(高め)
+    40: { name: "大魔王ニャンゾーマ", emoji: "😈👑🐈", hp: 118, type: "boss" }  // 最終ボス(基準値)
+};
     const maxStage = Object.keys(enemies).length;
 
     // --- localStorage関連 ---
@@ -824,7 +873,7 @@ function endBattle() {
             console.log("endBattle: ボス撃破と判定されました");
             playSound('enemyDefeated');
 
-            if (bossDefeatedMessage) { console.log("endBattle: bossDefeatedMessage にテキストを設定します"); bossDefeatedMessage.textContent = `🎉 ボス ${currentEnemy.name} 撃破！ 🎉`; } else { console.error("endBattle: bossDefeatedMessage が見つかりません！"); }
+            if (bossDefeatedMessage) { console.log("endBattle: bossDefeatedMessage にテキストを設定します"); bossDefeatedMessage.textContent = `🎉  ${currentEnemy.name} 撃破！ 🎉`; } else { console.error("endBattle: bossDefeatedMessage が見つかりません！"); }
             if (bossDefeatedOverlay) { console.log("endBattle: スタイルを直接変更して表示します"); bossDefeatedOverlay.style.display = 'flex'; bossDefeatedOverlay.style.opacity = '1'; if (bossDefeatedMessage) { bossDefeatedMessage.style.opacity = '1'; bossDefeatedMessage.style.transform = 'scale(1)'; } } else { console.error("endBattle: bossDefeatedOverlay が見つかりません！"); }
 
             console.log("endBattle: 3秒後にオーバーレイを非表示にするタイマーを設定します");
