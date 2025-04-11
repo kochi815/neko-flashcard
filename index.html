@@ -322,54 +322,54 @@ const sounds = {
 
     // --- 敵データ Lv40まで ---
     const enemies = {
-    // --- ステージ 1-10 (序盤問題) ---
-    1: { name: "ぷるぷるスライム", emoji: "💧", hp: 10, type: "normal" }, // 区分開始
-    2: { name: "スライム", emoji: "💧", hp: 10, type: "normal" },
-    3: { name: "おおきなスライム", emoji: "💧", hp: 11, type: "normal" },
-    4: { name: "ぶきみなコウモリ", emoji: "🦇", hp: 11, type: "normal" },
-    5: { name: "ボス コウモリロード", emoji: "🦇👑", hp: 15, type: "boss" },   // ボス1
-    6: { name: "さまようゴースト", emoji: "👻", hp: 12, type: "normal" },
-    7: { name: "ゴーストチーフ", emoji: "👻", hp: 13, type: "normal" },
-    8: { name: "ホネホネスケルトン", emoji: "💀", hp: 13, type: "normal" },
-    9: { name: "スケルトンナイト", emoji: "💀", hp: 14, type: "normal" }, // 区分終わり(高め)
-    10: { name: "ボス ゴブリンシャーマン", emoji: "👺✨", hp: 18, type: "boss" }, // ボス2
+    // --- ステージ 1-10 ---
+    1: { name: "ぷるぷるスライム", emoji: "💧", hp: 12, type: "normal" }, // (Ver3: 12) 区分開始 少し固く
+    2: { name: "スライム", emoji: "💧", hp: 12, type: "normal" }, // (Ver3: 12)
+    3: { name: "おおきなスライム", emoji: "💧", hp: 13, type: "normal" }, // (Ver3: 13)
+    4: { name: "ぶきみなコウモリ", emoji: "🦇", hp: 14, type: "normal" }, // (Ver3: 13) やや上げ
+    5: { name: "ボス コウモリロード", emoji: "🦇👑", hp: 20, type: "boss" },   // (Ver3: 18) ボス強調
+    6: { name: "さまようゴースト", emoji: "👻", hp: 16, type: "normal" }, // (Ver3: 14)
+    7: { name: "ゴーストチーフ", emoji: "👻", hp: 17, type: "normal" }, // (Ver3: 16)
+    8: { name: "ホネホネスケルトン", emoji: "💀", hp: 18, type: "normal" }, // (Ver3: 16)
+    9: { name: "スケルトンナイト", emoji: "💀", hp: 20, type: "normal" }, // (Ver3: 17) 終盤強調
+    10: { name: "ボス ゴブリンシャーマン", emoji: "👺✨", hp: 26, type: "boss" }, // (Ver3: 22) ボス強調
 
-    // --- ステージ 11-20 (中盤問題) ---
-    11: { name: "くさったしたい", emoji: "🧟", hp: 16, type: "normal" }, // 区分開始(Lv10より少し下げ)
-    12: { name: "マッドハンド", emoji: "✋", hp: 17, type: "normal" },
-    13: { name: "マッドハンドリーダー", emoji: "✋", hp: 18, type: "normal" },
-    14: { name: "ガーゴイル", emoji: "🗿🦇", hp: 19, type: "normal" },
-    15: { name: "ボス サイクロプス", emoji: "👁️", hp: 24, type: "boss" },   // ボス3
-    16: { name: "オーク", emoji: "🐗", hp: 21, type: "normal" },
-    17: { name: "オークリーダー", emoji: "🐗", hp: 22, type: "normal" },
-    18: { name: "ミノタウロス", emoji: "🐂", hp: 23, type: "normal" },
-    19: { name: "ミノタウロス（兄）", emoji: "🐂", hp: 25, type: "normal" }, // 区分終わり(高め)
-    20: { name: "ボス リッチ", emoji: "💀👑", hp: 30, type: "boss" },   // ボス4
+    // --- ステージ 11-20 ---
+    11: { name: "くさったしたい", emoji: "🧟", hp: 21, type: "normal" }, // (Ver3: 19) 区分開始(Lv10より下げつつ少し固く)
+    12: { name: "マッドハンド", emoji: "✋", hp: 22, type: "normal" }, // (Ver3: 20)
+    13: { name: "マッドハンドリーダー", emoji: "✋", hp: 24, type: "normal" }, // (Ver3: 22)
+    14: { name: "ガーゴイル", emoji: "🗿🦇", hp: 26, type: "normal" }, // (Ver3: 23)
+    15: { name: "ボス サイクロプス", emoji: "👁️", hp: 34, type: "boss" },   // (Ver3: 29) ボス強調
+    16: { name: "オーク", emoji: "🐗", hp: 28, type: "normal" }, // (Ver3: 25)
+    17: { name: "オークリーダー", emoji: "🐗", hp: 30, type: "normal" }, // (Ver3: 26)
+    18: { name: "ミノタウロス", emoji: "🐂", hp: 32, type: "normal" }, // (Ver3: 28)
+    19: { name: "ミノタウロス（兄）", emoji: "🐂", hp: 35, type: "normal" }, // (Ver3: 30) 終盤強調
+    20: { name: "ボス リッチ", emoji: "💀👑", hp: 42, type: "boss" },   // (Ver3: 36) ボス強調
 
-    // --- ステージ 21-30 (終盤問題) ---
-    21: { name: "アイスゴーレム", emoji: "🧊🗿", hp: 27, type: "normal" }, // 区分開始(Lv20より少し下げ)
-    22: { name: "フレイムゴーレム", emoji: "🔥🗿", hp: 28, type: "normal" },
-    23: { name: "キメラ", emoji: "🦁🐐🐍", hp: 30, type: "normal" },
-    24: { name: "キメラ（変異種）", emoji: "🦁🐐🐍", hp: 32, type: "normal" },
-    25: { name: "ボス グリフォン", emoji: "🦅🦁", hp: 38, type: "boss" },   // ボス5
-    26: { name: "レッサーデーモン", emoji: "👿", hp: 35, type: "normal" },
-    27: { name: "アークデーモン", emoji: "🔥👿", hp: 37, type: "normal" },
-    28: { name: "ダークナイト", emoji: "🛡️⚔️", hp: 40, type: "normal" },
-    29: { name: "デスナイト", emoji: "💀⚔️", hp: 43, type: "normal" }, // 区分終わり(高め)
-    30: { name: "ボス ドラゴンゾンビ", emoji: "💀🐉", hp: 50, type: "boss" }, // ボス6
+    // --- ステージ 21-30 ---
+    21: { name: "アイスゴーレム", emoji: "🧊🗿", hp: 36, type: "normal" }, // (Ver3: 32) 区分開始(Lv20より下げつつ少し固く)
+    22: { name: "フレイムゴーレム", emoji: "🔥🗿", hp: 38, type: "normal" }, // (Ver3: 33)
+    23: { name: "キメラ", emoji: "🦁🐐🐍", hp: 41, type: "normal" }, // (Ver3: 36)
+    24: { name: "キメラ（変異種）", emoji: "🦁🐐🐍", hp: 44, type: "normal" }, // (Ver3: 38)
+    25: { name: "ボス グリフォン", emoji: "🦅🦁", hp: 55, type: "boss" },   // (Ver3: 45) ボス強調
+    26: { name: "レッサーデーモン", emoji: "👿", hp: 48, type: "normal" }, // (Ver3: 42)
+    27: { name: "アークデーモン", emoji: "🔥👿", hp: 52, type: "normal" }, // (Ver3: 44)
+    28: { name: "ダークナイト", emoji: "🛡️⚔️", hp: 56, type: "normal" }, // (Ver3: 48)
+    29: { name: "デスナイト", emoji: "💀⚔️", hp: 60, type: "normal" }, // (Ver3: 51) 終盤強調
+    30: { name: "ボス ドラゴンゾンビ", emoji: "💀🐉", hp: 72, type: "boss" }, // (Ver3: 60) ボス強調
 
-    // --- ステージ 31-40 (最難関問題/虫食い) ---
-    // ※メタル系のHPは意図的に低く設定しています。必要に応じて調整してください。
-    31: { name: "メタルスライム", emoji: "⚙️💧", hp: 20, type: "normal" }, // ★HP注意 (低め設定案)
-    32: { name: "はぐれメタル", emoji: "✨💧", hp: 25, type: "normal" }, // ★HP注意 (低め設定案)
-    33: { name: "魔界の騎士", emoji: "😈⚔️", hp: 55, type: "normal" }, // メタル後、本格的に難関へ
-    34: { name: "魔界の魔道士", emoji: "😈🧙", hp: 60, type: "normal" },
-    35: { name: "ボス ヒドラ", emoji: "🐍🐍🐍", hp: 75, type: "boss" },   // ボス7
-    36: { name: "魔王のしもべ・炎", emoji: "🔥しもべ", hp: 70, type: "normal" },
-    37: { name: "魔王のしもべ・氷", emoji: "🧊しもべ", hp: 75, type: "normal" },
-    38: { name: "魔王のしもべ・雷", emoji: "⚡しもべ", hp: 80, type: "normal" },
-    39: { name: "魔王親衛隊長", emoji: "👑🛡️⚔️", hp: 90, type: "normal" }, // 区分終わり(高め)
-    40: { name: "大魔王ニャンゾーマ", emoji: "😈👑🐈", hp: 118, type: "boss" }  // 最終ボス(基準値)
+    // --- ステージ 31-40 ---
+    // ※メタル系のHPは前回と同じ低い値を維持。必要なら調整を。
+    31: { name: "メタルスライム", emoji: "⚙️💧", hp: 20, type: "normal" }, // ★HP注意 (低め維持案)
+    32: { name: "はぐれメタル", emoji: "✨💧", hp: 25, type: "normal" }, // ★HP注意 (低め維持案)
+    33: { name: "魔界の騎士", emoji: "😈⚔️", hp: 65, type: "normal" }, // (Ver3: 66) 区分開始(Lv30より下げつつ)
+    34: { name: "魔界の魔道士", emoji: "😈🧙", hp: 70, type: "normal" }, // (Ver3: 72)
+    35: { name: "ボス ヒドラ", emoji: "🐍🐍🐍", hp: 95, type: "boss" },   // (Ver3: 90) ボス強調
+    36: { name: "魔王のしもべ・炎", emoji: "🔥しもべ", hp: 85, type: "normal" }, // (Ver3: 84)
+    37: { name: "魔王のしもべ・氷", emoji: "🧊しもべ", hp: 90, type: "normal" }, // (Ver3: 90)
+    38: { name: "魔王のしもべ・雷", emoji: "⚡しもべ", hp: 100, type: "normal" }, // (Ver3: 96) 少し強調
+    39: { name: "魔王親衛隊長", emoji: "👑🛡️⚔️", hp: 115, type: "normal" }, // (Ver3: 108) 終盤強調
+    40: { name: "大魔王ニャンゾーマ", emoji: "😈👑🐈", hp: 141, type: "boss" }  // (Ver3: 141) 最終ボス(固定)
 };
     const maxStage = Object.keys(enemies).length;
 
@@ -842,7 +842,7 @@ function handleAnswer(selectedAnswer) {
 
 
           // --- startBattle関数 ---
-    function startBattle() { currentEnemy = enemies[currentStage] || enemies[maxStage]; if (!currentEnemy) { console.error("Error: Cannot find enemy data for stage", currentStage); return; } enemyMaxHP = currentEnemy.hp; if (currentEnemy.type === 'boss') { enemyMaxHP = Math.floor(enemyMaxHP * 1.5); } let hpMultiplier = 1.0; switch (gameMode) { case 'grade1': hpMultiplier = 0.5; break; case 'grade2': hpMultiplier = 0.7; break; case 'grade3': hpMultiplier = 0.9; break; case 'grade4': hpMultiplier = 0.95; break; case 'grade5': hpMultiplier = 1.0; break; } enemyMaxHP = Math.max(5, Math.floor(enemyMaxHP * hpMultiplier)); enemyHP = enemyMaxHP; playerHP = playerMaxHP; currentProblemIndex = 0; comboCount = 0; updateComboDisplay(); questionsForThisStage = (currentEnemy.type === 'boss') ? 35 : 25; problems = generateProblems(currentStage, gameMode, questionsForThisStage); if (!problems || problems.length === 0) { console.error("Error: generateProblems returned empty!", {currentStage, gameMode, questionsForThisStage}); battleLog.textContent = "エラー：問題生成失敗"; return; } enemyName.textContent = `${currentEnemy.emoji} ${currentEnemy.name} (Lv${currentStage})`; enemyHPText.textContent = enemyHP; playerHPText.textContent = playerHP; updateHPBar('enemyHPBar', enemyHP, enemyMaxHP); updateHPBar('playerHPBar', playerHP, playerMaxHP); enemyCharacter.textContent = currentEnemy.emoji; enemyCharacter.classList.remove('defeated'); stopBgm(); if (currentEnemy.type === 'boss') { document.body.classList.add('boss-battle-bg'); battleLog.textContent = `🔥ボス出現！ ${currentEnemy.name} があらわれた！🔥`; playBgm('bgmBoss'); } else { document.body.classList.remove('boss-battle-bg'); battleLog.textContent = `Lv${currentStage} ${currentEnemy.name} があらわれた！`; playBgm('bgmNormal'); } startBtn.style.display = "none"; battleInProgress = false; setTimeout(showQuestion, 1500); }
+    function startBattle() { currentEnemy = enemies[currentStage] || enemies[maxStage]; if (!currentEnemy) { console.error("Error: Cannot find enemy data for stage", currentStage); return; } enemyMaxHP = currentEnemy.hp; if (currentEnemy.type === 'boss') { enemyMaxHP = Math.floor(enemyMaxHP * 1.5); } let hpMultiplier = 1.0; switch (gameMode) { case 'grade1': hpMultiplier = 0.7; break; case 'grade2': hpMultiplier = 0.7; break; case 'grade3': hpMultiplier = 0.9; break; case 'grade4': hpMultiplier = 0.95; break; case 'grade5': hpMultiplier = 1.0; break; } enemyMaxHP = Math.max(5, Math.floor(enemyMaxHP * hpMultiplier)); enemyHP = enemyMaxHP; playerHP = playerMaxHP; currentProblemIndex = 0; comboCount = 0; updateComboDisplay(); questionsForThisStage = (currentEnemy.type === 'boss') ? 35 : 25; problems = generateProblems(currentStage, gameMode, questionsForThisStage); if (!problems || problems.length === 0) { console.error("Error: generateProblems returned empty!", {currentStage, gameMode, questionsForThisStage}); battleLog.textContent = "エラー：問題生成失敗"; return; } enemyName.textContent = `${currentEnemy.emoji} ${currentEnemy.name} (Lv${currentStage})`; enemyHPText.textContent = enemyHP; playerHPText.textContent = playerHP; updateHPBar('enemyHPBar', enemyHP, enemyMaxHP); updateHPBar('playerHPBar', playerHP, playerMaxHP); enemyCharacter.textContent = currentEnemy.emoji; enemyCharacter.classList.remove('defeated'); stopBgm(); if (currentEnemy.type === 'boss') { document.body.classList.add('boss-battle-bg'); battleLog.textContent = `🔥ボス出現！ ${currentEnemy.name} があらわれた！🔥`; playBgm('bgmBoss'); } else { document.body.classList.remove('boss-battle-bg'); battleLog.textContent = `Lv${currentStage} ${currentEnemy.name} があらわれた！`; playBgm('bgmNormal'); } startBtn.style.display = "none"; battleInProgress = false; setTimeout(showQuestion, 1500); }
 
 // --- endBattle関数 --- (ここからコピー・タイマークリア追加版)
 function endBattle() {
